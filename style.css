@@ -1,0 +1,574 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #090f1d;
+  --surface: #111b2e;
+  --surface-hover: #17243a;
+  --border: #26354d;
+  --text: #f0f5ff;
+  --muted: #91a1bb;
+  --primary: #4f9cff;
+  --primary-light: #80beff;
+  --green: #41d7ab;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image: radial-gradient(
+    ellipse at 50% 0%,
+    #152948 0%,
+    transparent 55%
+  );
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Navigation */
+
+.navbar {
+  height: 82px;
+  padding: 0 max(6%, calc((100% - 1100px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(9, 15, 29, 0.7);
+}
+
+.brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  background: var(--primary);
+  color: #07101f;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.accent {
+  color: var(--primary);
+}
+
+.nav-status {
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.status-dot {
+  height: 8px;
+  width: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 13px var(--green);
+}
+
+/* Main content */
+
+.container {
+  width: 90%;
+  max-width: 940px;
+  margin: auto;
+  padding-bottom: 90px;
+}
+
+.hero {
+  text-align: center;
+  padding: 92px 0 50px;
+}
+
+.eyebrow {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+}
+
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(44px, 7vw, 76px);
+  line-height: 1.1;
+  letter-spacing: -3px;
+  margin: 22px 0;
+}
+
+.hero h1 span {
+  color: var(--primary-light);
+}
+
+.hero p {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Search */
+
+.search-panel {
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .15);
+}
+
+.search-panel label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 1.6px;
+  margin-bottom: 14px;
+}
+
+.search-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #0b1424;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 17px;
+  transition: border .2s;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--primary);
+}
+
+.input-wrapper span {
+  color: var(--primary);
+  font-size: 22px;
+}
+
+input {
+  width: 100%;
+  padding: 17px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font: inherit;
+  font-size: 15px;
+  min-width: 0;
+}
+
+input::placeholder {
+  color: #72829a;
+}
+
+button {
+  background: var(--primary);
+  color: #061323;
+  border: none;
+  border-radius: 12px;
+  padding: 0 28px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: .2s;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: #82bdff;
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: wait;
+  transform: none;
+}
+
+.search-hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 13px 0 0;
+}
+
+/* Results */
+
+.results {
+  margin-top: 58px;
+  animation: appear .4s ease;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  letter-spacing: -1px;
+  margin: 8px 0 0;
+}
+
+.flight-badge {
+  color: #60dfb6;
+  background: rgba(65, 215, 171, .1);
+  border: 1px solid rgba(65, 215, 171, .25);
+  padding: 9px 17px;
+  font-weight: 700;
+  font-size: 12px;
+  border-radius: 100px;
+}
+
+.flight-badge.delayed {
+  color: #ffc56f;
+  background: rgba(255, 197, 111, .1);
+  border-color: rgba(255, 197, 111, .25);
+}
+
+.flight-badge.cancelled {
+  color: #ff8f98;
+  background: rgba(255, 100, 120, .1);
+  border-color: rgba(255, 100, 120, .25);
+}
+
+.flight-badge.airborne {
+  color: #85bfff;
+  background: rgba(79, 156, 255, .1);
+  border-color: rgba(79, 156, 255, .25);
+}
+
+.flight-card {
+  background: linear-gradient(
+    135deg,
+    #172943,
+    #101b2d
+  );
+  border: 1px solid #304561;
+  border-radius: 22px;
+  padding: 45px 44px;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.airport {
+  flex: 1;
+  min-width: 0;
+}
+
+.airport-right {
+  text-align: right;
+}
+
+.airport-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.airport-code {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 7vw, 64px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  margin: 12px 0 5px;
+}
+
+.airport-name {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.flight-time {
+  margin-top: 20px;
+  color: var(--primary-light);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.route-center {
+  flex: 1;
+  text-align: center;
+  color: var(--primary);
+  min-width: 60px;
+}
+
+.plane-icon {
+  font-size: 30px;
+}
+
+.route-line {
+  height: 1px;
+  margin: 15px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--primary),
+    transparent
+  );
+}
+
+.route-caption {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+/* Information cards */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 25px;
+  border-radius: 17px;
+  transition: .2s;
+}
+
+.info-card:hover,
+.weather-card:hover {
+  background: var(--surface-hover);
+  border-color: #405b7d;
+}
+
+.info-icon {
+  font-size: 23px;
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+
+.info-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.info-value {
+  margin-top: 7px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 23px;
+}
+
+.small-value {
+  font-size: 19px;
+}
+
+/* Weather */
+
+.weather-heading {
+  margin: 54px 0 23px;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.weather-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 29px;
+  transition: .2s;
+}
+
+.weather-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.weather-symbol {
+  color: var(--primary-light);
+  font-size: 27px;
+}
+
+.weather-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 25px;
+  margin: 25px 0 10px;
+}
+
+.temperature {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.weather-card p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.weather-extra {
+  font-size: 12px;
+  color: var(--primary-light);
+  margin-top: 18px;
+}
+
+/* Loading and errors */
+
+.error {
+  margin-top: 20px;
+  padding: 17px 20px;
+  border: 1px solid #8f3a4f;
+  border-radius: 12px;
+  background: #351927;
+  color: #ffb1bc;
+  font-size: 14px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 50px 0;
+  color: var(--muted);
+}
+
+.spinner {
+  height: 22px;
+  width: 22px;
+  border: 3px solid #263e59;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer */
+
+footer {
+  padding: 28px 6%;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  font-size: 12px;
+}
+
+/* Mobile layout */
+
+@media (max-width: 650px) {
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .nav-status {
+    font-size: 0;
+  }
+
+  .hero {
+    padding: 65px 0 38px;
+  }
+
+  .hero h1 {
+    letter-spacing: -2px;
+  }
+
+  .search-panel {
+    padding: 20px;
+  }
+
+  .search-row {
+    flex-direction: column;
+  }
+
+  button {
+    padding: 17px;
+  }
+
+  .flight-card {
+    padding: 28px 18px;
+  }
+
+  .airport-name {
+    font-size: 11px;
+  }
+
+  .route-center {
+    min-width: 38px;
+  }
+
+  .route-caption {
+    display: none;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-grid {
+    grid-template-columns: 1fr;
+  }
+
+  footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}

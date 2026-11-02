@@ -4,554 +4,409 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FlightWeather Tracker</title>
-
-  <style>
-    :root {
-      font-family: Arial, sans-serif;
-      color: #ecf4ff;
-      background: #081526;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #081526;
-    }
-
-    .container {
-      max-width: 1050px;
-      margin: auto;
-      padding: 30px 22px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 65px;
-    }
-
-    .brand {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .accent {
-      color: #64d5fb;
-    }
-
-    h1 {
-      font-size: clamp(36px, 6vw, 60px);
-      margin-bottom: 15px;
-    }
-
-    .intro {
-      color: #a8bdd1;
-      font-size: 17px;
-      line-height: 1.6;
-    }
-
-    form {
-      display: flex;
-      gap: 12px;
-      background: #132a43;
-      border: 1px solid #35516c;
-      border-radius: 15px;
-      padding: 12px;
-      margin-top: 30px;
-    }
-
-    input {
-      flex: 1;
-      min-width: 0;
-      background: transparent;
-      color: white;
-      border: none;
-      outline: none;
-      font-size: 17px;
-      padding: 12px;
-    }
-
-    button {
-      background: #58cbf6;
-      border: none;
-      border-radius: 10px;
-      padding: 14px 22px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .message {
-      margin-top: 20px;
-      color: #ffd5a5;
-      padding: 15px;
-      background: #4c3226;
-      border-radius: 10px;
-    }
-
-    .results {
-      margin-top: 45px;
-    }
-
-    .card {
-      background: #12273e;
-      border: 1px solid #2b4965;
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-
-    .route {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .airport-code {
-      font-size: 45px;
-      font-weight: bold;
-    }
-
-    .muted {
-      color: #a8bdd1;
-    }
-
-    .right {
-      text-align: right;
-    }
-
-    .details,
-    .weather-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 25px;
-    }
-
-    .label {
-      font-size: 12px;
-      color: #8eabc4;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .value {
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    .temperature {
-      font-size: 42px;
-      font-weight: bold;
-      margin: 20px 0;
-    }
-
-    .status {
-      color: #81f0c6;
-      font-weight: bold;
-    }
-
-    footer {
-      margin-top: 60px;
-      color: #8eabc4;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 650px) {
-      form {
-        flex-direction: column;
-      }
-
-      button {
-        width: 100%;
-      }
-
-      .weather-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .airport-code {
-        font-size: 34px;
-      }
-
-      header {
-        padding-bottom: 35px;
-      }
-    }
-  </style>
+  <title>AeroTrack | Live Flight Tracker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <div class="container">
 
-    <header>
-      <div class="brand">
-        ✈ FlightWeather <span class="accent">Tracker</span>
+  <header class="navbar">
+    <div class="brand">
+      <span class="brand-icon">✈</span>
+      <span>Aero<span class="accent">Track</span></span>
+    </div>
+    <span class="nav-status">
+      <span class="status-dot"></span>
+      Live Flight Intelligence
+    </span>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="eyebrow">YOUR JOURNEY, SIMPLIFIED</div>
+      <h1>Every flight.<br><span>One dashboard.</span></h1>
+      <p>Track flight status, schedules, and airport weather in one beautiful place.</p>
+    </section>
+
+    <section class="search-panel">
+      <label for="flightInput">TRACK A FLIGHT</label>
+      <div class="search-row">
+        <div class="input-wrapper">
+          <span>✈</span>
+          <input id="flightInput" type="text" placeholder="Enter flight number (e.g. AA100)" autocomplete="off">
+        </div>
+        <button id="searchBtn">Track Flight →</button>
       </div>
-    </header>
+      <p class="search-hint">Enter an airline flight number to get started.</p>
+    </section>
 
-    <main>
-      <section>
-        <p class="accent">KNOW BEFORE YOU FLY</p>
-        <h1>Your flight and the <span class="accent">weather ahead.</span></h1>
-        <p class="intro">
-          Check flight status and current weather at your departure
-          and arrival airports in one place.
-        </p>
+    <div id="errorMessage" class="error hidden" role="alert"></div>
 
-        <form id="searchForm">
-          <input id="flightInput" placeholder="Enter flight number, e.g. AAL100" value="AAL100" maxlength="10" required>
-          <button id="searchButton" type="submit">
-            Search Flight
-          </button>
-        </form>
-      </section>
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <span>Searching flight information...</span>
+    </div>
 
-      <div id="message" class="message hidden" role="alert"></div>
+    <section id="results" class="results hidden">
 
-      <section id="results" class="results hidden">
-        <h2>Flight Overview</h2>
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">FLIGHT OVERVIEW</span>
+          <h2 id="flightNumber">Flight</h2>
+        </div>
+        <span id="flightStatus" class="flight-badge">Scheduled</span>
+      </div>
 
-        <div class="card">
-          <div class="route">
-            <div>
-              <div id="fromCode" class="airport-code">JFK</div>
-              <div id="fromName" class="muted"></div>
-            </div>
-
-            <div class="accent">✈</div>
-
-            <div class="right">
-              <div id="toCode" class="airport-code">LHR</div>
-              <div id="toName" class="muted"></div>
-            </div>
+      <div class="flight-card">
+        <div class="route">
+          <div class="airport">
+            <div class="airport-label">DEPARTURE</div>
+            <div class="airport-code" id="originCode">---</div>
+            <div class="airport-name" id="originName">Origin</div>
+            <div class="flight-time" id="departureTime">--:--</div>
           </div>
 
-          <div class="details">
-            <div>
-              <div class="label">Flight Number</div>
-              <div id="flightNumber" class="value"></div>
-            </div>
+          <div class="route-center">
+            <span class="plane-icon">✈</span>
+            <div class="route-line"></div>
+            <span class="route-caption">FLIGHT ROUTE</span>
+          </div>
 
-            <div>
-              <div class="label">Flight Status</div>
-              <div id="flightStatus" class="value status"></div>
-            </div>
-
-            <div>
-              <div class="label">Scheduled Departure (UTC)</div>
-              <div id="departureTime" class="value"></div>
-            </div>
-
-            <div>
-              <div class="label">Scheduled Arrival (UTC)</div>
-              <div id="arrivalTime" class="value"></div>
-            </div>
-
-            <div>
-              <div class="label">Departure Delay</div>
-              <div id="departureDelay" class="value"></div>
-            </div>
-
-            <div>
-              <div class="label">Arrival Delay</div>
-              <div id="arrivalDelay" class="value"></div>
-            </div>
+          <div class="airport airport-right">
+            <div class="airport-label">ARRIVAL</div>
+            <div class="airport-code" id="destinationCode">---</div>
+            <div class="airport-name" id="destinationName">Destination</div>
+            <div class="flight-time" id="arrivalTime">--:--</div>
           </div>
         </div>
+      </div>
 
-        <h2>Current Airport Weather</h2>
-
-        <div class="weather-grid">
-          <div class="card">
-            <h3 id="departureWeatherTitle">Departure Weather</h3>
-            <p id="departureWeatherCity" class="muted"></p>
-            <div id="departureTemp" class="temperature"></div>
-
-            <div class="details">
-              <div>
-                <div class="label">Conditions</div>
-                <div id="departureCondition" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Wind</div>
-                <div id="departureWind" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Humidity</div>
-                <div id="departureHumidity" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Precipitation</div>
-                <div id="departureRain" class="value"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3 id="arrivalWeatherTitle">Arrival Weather</h3>
-            <p id="arrivalWeatherCity" class="muted"></p>
-            <div id="arrivalTemp" class="temperature"></div>
-
-            <div class="details">
-              <div>
-                <div class="label">Conditions</div>
-                <div id="arrivalCondition" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Wind</div>
-                <div id="arrivalWind" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Humidity</div>
-                <div id="arrivalHumidity" class="value"></div>
-              </div>
-
-              <div>
-                <div class="label">Precipitation</div>
-                <div id="arrivalRain" class="value"></div>
-              </div>
-            </div>
-          </div>
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-icon">◷</div>
+          <div class="info-label">Departure Delay</div>
+          <div class="info-value" id="departureDelay">—</div>
         </div>
-      </section>
-    </main>
 
-    <footer>
-      FlightWeather Tracker | Student Prototype
-      <p>
-        Flight information is provided by FlightAware.
-        Weather information is provided by Open-Meteo.
-        Always confirm flight details with your airline.
-      </p>
-    </footer>
+        <div class="info-card">
+          <div class="info-icon">◷</div>
+          <div class="info-label">Arrival Delay</div>
+          <div class="info-value" id="arrivalDelay">—</div>
+        </div>
 
-  </div>
+        <div class="info-card">
+          <div class="info-icon">✈</div>
+          <div class="info-label">Aircraft</div>
+          <div class="info-value small-value" id="aircraft">Unknown</div>
+        </div>
+      </div>
+
+      <div class="weather-heading">
+        <span class="eyebrow">AIRPORT CONDITIONS</span>
+        <h2>Weather overview</h2>
+      </div>
+
+      <div class="weather-grid">
+        <div class="weather-card">
+          <div class="weather-card-top">
+            <span>DEPARTURE AIRPORT</span>
+            <span class="weather-symbol">☀</span>
+          </div>
+          <h3 id="originWeatherCode">---</h3>
+          <div class="temperature" id="originTemp">--°</div>
+          <p id="originCondition">Weather unavailable</p>
+          <div class="weather-extra" id="originWind"></div>
+        </div>
+
+        <div class="weather-card">
+          <div class="weather-card-top">
+            <span>ARRIVAL AIRPORT</span>
+            <span class="weather-symbol">☁</span>
+          </div>
+          <h3 id="destinationWeatherCode">---</h3>
+          <div class="temperature" id="destinationTemp">--°</div>
+          <p id="destinationCondition">Weather unavailable</p>
+          <div class="weather-extra" id="destinationWind"></div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <span>AeroTrack © 2026</span>
+    <span>Powered by live aviation and weather data</span>
+  </footer>
 
   <script>
-    // REPLACE THIS WITH YOUR AWS API GATEWAY INVOKE URL
-    const API_BASE_URL =
-      "https://hkzcowus58.execute-api.us-east-1.amazonaws.com/";
+    const API_BASE_URL = "https://hkzcowus58.execute-api.us-east-1.amazonaws.com/";
 
-    const el = id => document.getElementById(id);
+    const $ = id => document.getElementById(id);
+
+    $("searchBtn").addEventListener("click", trackFlight);
+
+    $("flightInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") trackFlight();
+    });
 
     function setText(id, value) {
-      el(id).textContent = value ?? "Unavailable";
+      $(id).textContent =
+        value === undefined || value === null || value === ""
+          ? "—"
+          : String(value);
+    }
+
+    function first(...values) {
+      return values.find(v =>
+        v !== undefined && v !== null && v !== ""
+      );
     }
 
     function formatTime(value) {
-      if (!value) return "Unavailable";
-
-      return new Date(value).toLocaleString("en-US", {
-        timeZone: "UTC",
-        dateStyle: "medium",
-        timeStyle: "short"
-      }) + " UTC";
+      if (!value) return "—";
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return String(value);
+      return date.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short"
+      });
     }
 
-    function formatDelay(seconds) {
-      if (seconds == null) return "Unavailable";
-      if (seconds <= 0) return "On time";
+    function formatDelay(value) {
+      if (value === undefined || value === null) return "—";
+      const minutes = Number(value);
+      if (!Number.isFinite(minutes)) return String(value);
+      if (minutes <= 0) return "On time";
+      return `${Math.round(minutes)} min`;
+    }
 
-      return Math.ceil(seconds / 60) + " minutes";
+    function airportCode(value) {
+      if (typeof value === "string") return value;
+      return first(
+        value?.code,
+        value?.iata,
+        value?.iata_code,
+        value?.icao,
+        value?.icao_code,
+        "---"
+      );
     }
 
     function weatherDescription(code) {
-      if (code == null) return "Unknown";
-      if (code === 0) return "Clear sky";
-      if (code <= 3) return "Partly cloudy";
-      if (code <= 48) return "Foggy";
-      if (code <= 67) return "Rain";
-      if (code <= 77) return "Snow";
-      if (code <= 82) return "Rain showers";
-      if (code <= 86) return "Snow showers";
-      if (code >= 95) return "Thunderstorm";
-
-      return "Mixed conditions";
+      const descriptions = {
+        0: "Clear sky",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Freezing fog",
+        51: "Light drizzle",
+        53: "Drizzle",
+        55: "Dense drizzle",
+        61: "Light rain",
+        63: "Rain",
+        65: "Heavy rain",
+        71: "Light snow",
+        73: "Snow",
+        75: "Heavy snow",
+        80: "Rain showers",
+        81: "Rain showers",
+        82: "Heavy showers",
+        95: "Thunderstorm"
+      };
+      return descriptions[code] || "Conditions available";
     }
 
-    function displayWeather(prefix, airport) {
-      setText(
-        prefix + "WeatherTitle",
-        (airport.airport || "Airport") + " Weather"
+    function displayWeather(prefix, airport, weather) {
+      setText(prefix + "WeatherCode", airport);
+
+      const current = weather?.current || weather?.current_weather || weather || {};
+      const temp = first(
+        current.temperature_2m,
+        current.temperature,
+        current.temp,
+        weather?.temperature
       );
 
-      setText(
-        prefix + "WeatherCity",
-        (airport.name || "") + ", " + (airport.city || "")
+      const wind = first(
+        current.wind_speed_10m,
+        current.windspeed,
+        current.wind_speed
       );
 
-      const weather = airport.weather || {};
-
-      if (!weather.available) {
-        setText(prefix + "Temp", "Unavailable");
-        setText(prefix + "Condition", "Unavailable");
-        setText(prefix + "Wind", "Unavailable");
-        setText(prefix + "Humidity", "Unavailable");
-        setText(prefix + "Rain", "Unavailable");
-        return;
-      }
-
-      const c = weather.conditions || {};
-
-      setText(
-        prefix + "Temp",
-        c.temperature_2m != null
-          ? c.temperature_2m + "°F"
-          : "Unavailable"
+      const code = first(current.weather_code, current.weathercode);
+      const description = first(
+        current.description,
+        current.condition,
+        code !== undefined ? weatherDescription(code) : null
       );
 
-      setText(
-        prefix + "Condition",
-        weatherDescription(c.weather_code)
-      );
-
-      setText(
-        prefix + "Wind",
-        c.wind_speed_10m != null
-          ? c.wind_speed_10m + " mph"
-          : "Unavailable"
-      );
-
-      setText(
-        prefix + "Humidity",
-        c.relative_humidity_2m != null
-          ? c.relative_humidity_2m + "%"
-          : "Unavailable"
-      );
-
-      setText(
-        prefix + "Rain",
-        c.precipitation != null
-          ? c.precipitation + " mm"
-          : "Unavailable"
-      );
+      setText(prefix + "Temp", temp === undefined ? "—" : `${Math.round(Number(temp))}°`);
+      setText(prefix + "Condition", description || "Weather unavailable");
+      setText(prefix + "Wind", wind === undefined ? "" : `Wind: ${wind} km/h`);
     }
 
-    function displayFlight(data) {
-      const flight = data.flight;
-      const departure = data.departure;
-      const arrival = data.arrival;
+    async function trackFlight() {
+      const flightId = $("flightInput").value.trim().toUpperCase();
 
-      setText("flightNumber", flight.number);
-      setText("flightStatus", flight.status);
-
-      setText("fromCode", departure.airport);
-      setText("fromName", departure.city);
-
-      setText("toCode", arrival.airport);
-      setText("toName", arrival.city);
-
-      setText(
-        "departureTime",
-        formatTime(flight.scheduled_departure)
-      );
-
-      setText(
-        "arrivalTime",
-        formatTime(flight.scheduled_arrival)
-      );
-
-      setText(
-        "departureDelay",
-        formatDelay(flight.departure_delay_seconds)
-      );
-
-      setText(
-        "arrivalDelay",
-        formatDelay(flight.arrival_delay_seconds)
-      );
-
-      displayWeather("departure", departure);
-      displayWeather("arrival", arrival);
-
-      el("results").classList.remove("hidden");
-    }
-
-    async function searchFlight(event) {
-      event.preventDefault();
-
-      const flightId = el("flightInput")
-        .value.trim().toUpperCase();
-
-      const button = el("searchButton");
-
-      el("message").classList.add("hidden");
-      el("results").classList.add("hidden");
-
-      if (!/^[A-Z0-9]{2,10}$/.test(flightId)) {
-        showError("Please enter a valid flight number.");
+      if (!flightId) {
+        showError("Please enter a flight number.");
         return;
       }
 
       if (API_BASE_URL.includes("PASTE_YOUR")) {
-        showError("Please configure your API Gateway URL.");
+        showError("Add your AWS API Gateway URL in index.html first.");
         return;
       }
 
-      button.disabled = true;
-      button.textContent = "Searching...";
+      $("results").classList.add("hidden");
+      $("errorMessage").classList.add("hidden");
+      $("loading").classList.remove("hidden");
+      $("searchBtn").disabled = true;
 
       try {
-        const url = API_BASE_URL.replace(/\/$/, "")
-          + "/flight?flight_id="
-          + encodeURIComponent(flightId);
+        const base = API_BASE_URL.replace(/\/+$/, "");
+        const root = base.endsWith("/flight") ? base : `${base}/flight`;
+        const url = `${root}?flight_id=${encodeURIComponent(flightId)}`;
 
         const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error(
-            "Unable to retrieve flight information."
-          );
+          throw new Error(`API request failed with status ${response.status}`);
         }
 
-        const data = await response.json();
+        let data = await response.json();
 
-        if (!data.flight || !data.departure || !data.arrival) {
-          throw new Error("Invalid API response.");
+        // Supports an API Gateway response containing a JSON body.
+        if (typeof data.body === "string") {
+          data = JSON.parse(data.body);
+        } else if (data.body && typeof data.body === "object") {
+          data = data.body;
         }
 
-        displayFlight(data);
+        if (data.error || data.message === "not found") {
+          throw new Error(data.error || "Flight not found.");
+        }
+
+        renderFlight(data, flightId);
 
       } catch (error) {
-        showError(error.message);
+        console.error(error);
+        showError(
+          error instanceof TypeError
+            ? "Could not connect to the API. Check your endpoint and CORS configuration."
+            : error.message
+        );
       } finally {
-        button.disabled = false;
-        button.textContent = "Search Flight";
+        $("loading").classList.add("hidden");
+        $("searchBtn").disabled = false;
       }
     }
 
-    function showError(message) {
-      el("message").textContent = message;
-      el("message").classList.remove("hidden");
+    function renderFlight(data, requestedId) {
+      const flight = data.flight || data;
+      const origin = first(flight.origin, flight.departure_airport);
+      const destination = first(flight.destination, flight.arrival_airport);
+
+      const originCode = first(
+        flight.origin_code,
+        airportCode(origin),
+        "---"
+      );
+      const destinationCode = first(
+        flight.destination_code,
+        airportCode(destination),
+        "---"
+      );
+
+      const status = first(flight.status, "Unknown");
+
+      setText("flightNumber", first(flight.number, flight.ident, requestedId));
+      setText("flightStatus", status);
+      setText("originCode", originCode);
+      setText("destinationCode", destinationCode);
+
+      setText("originName",
+        first(origin?.name, flight.origin_name, "Departure airport")
+      );
+      setText("destinationName",
+        first(destination?.name, flight.destination_name, "Arrival airport")
+      );
+
+      setText("departureTime", formatTime(first(
+        flight.estimated_departure,
+        flight.scheduled_departure,
+        flight.departure_time
+      )));
+
+      setText("arrivalTime", formatTime(first(
+        flight.estimated_arrival,
+        flight.scheduled_arrival,
+        flight.arrival_time
+      )));
+
+      setText("departureDelay", formatDelay(flight.departure_delay));
+      setText("arrivalDelay", formatDelay(flight.arrival_delay));
+
+      setText("aircraft", first(
+        flight.aircraft_type,
+        flight.aircraft,
+        "Unknown"
+      ));
+
+      const weather = data.weather || {};
+
+      displayWeather(
+        "origin",
+        originCode,
+        first(
+          data.departure_weather,
+          data.origin_weather,
+          weather.departure,
+          weather.origin,
+          {}
+        )
+      );
+
+      displayWeather(
+        "destination",
+        destinationCode,
+        first(
+          data.arrival_weather,
+          data.destination_weather,
+          weather.arrival,
+          weather.destination,
+          {}
+        )
+      );
+
+      const badge = $("flightStatus");
+      const statusText = String(status).toLowerCase();
+
+      badge.className = "flight-badge";
+      if (statusText.includes("cancel")) {
+        badge.classList.add("cancelled");
+      } else if (statusText.includes("delay")) {
+        badge.classList.add("delayed");
+      } else if (
+        statusText.includes("air") ||
+        statusText.includes("route")
+      ) {
+        badge.classList.add("airborne");
+      }
+
+      $("results").classList.remove("hidden");
     }
 
-    el("searchForm").addEventListener(
-      "submit",
-      searchFlight
-    );
+    function showError(message) {
+      $("errorMessage").textContent = message;
+      $("errorMessage").classList.remove("hidden");
+    }
   </script>
+
 </body>
 
 </html>
