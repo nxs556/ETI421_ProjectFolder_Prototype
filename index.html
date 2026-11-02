@@ -27,10 +27,7 @@
     <section class="hero">
       <div class="eyebrow">YOUR JOURNEY, SIMPLIFIED</div>
       <h1>Every flight.<br><span>One dashboard.</span></h1>
-      <p>
-        Track flight status, schedules, and airport weather
-        in one beautiful place.
-      </p>
+      <p>Track flight status, schedules, and airport weather in one beautiful place.</p>
     </section>
 
     <section class="search-panel">
@@ -42,15 +39,10 @@
           <input id="flightInput" type="text" placeholder="Enter flight number (e.g. AA100)" autocomplete="off"
             maxlength="10">
         </div>
-
-        <button id="searchBtn" type="button">
-          Track Flight →
-        </button>
+        <button id="searchBtn" type="button">Track Flight →</button>
       </div>
 
-      <p class="search-hint">
-        Enter an airline flight number to get started.
-      </p>
+      <p class="search-hint">Enter an airline flight number to get started.</p>
     </section>
 
     <div id="errorMessage" class="error hidden" role="alert"></div>
@@ -67,10 +59,7 @@
           <span class="eyebrow">FLIGHT OVERVIEW</span>
           <h2 id="flightNumber">Flight</h2>
         </div>
-
-        <span id="flightStatus" class="flight-badge">
-          Scheduled
-        </span>
+        <span id="flightStatus" class="flight-badge">Scheduled</span>
       </div>
 
       <div class="flight-card">
@@ -92,9 +81,7 @@
           <div class="airport airport-right">
             <div class="airport-label">ARRIVAL</div>
             <div class="airport-code" id="destinationCode">---</div>
-            <div class="airport-name" id="destinationName">
-              Destination
-            </div>
+            <div class="airport-name" id="destinationName">Destination</div>
             <div class="flight-time" id="arrivalTime">--:--</div>
           </div>
 
@@ -118,9 +105,7 @@
         <div class="info-card">
           <div class="info-icon">✈</div>
           <div class="info-label">Aircraft</div>
-          <div class="info-value small-value" id="aircraft">
-            Unknown
-          </div>
+          <div class="info-value small-value" id="aircraft">Unknown</div>
         </div>
 
       </div>
@@ -135,7 +120,7 @@
         <div class="weather-card">
           <div class="weather-card-top">
             <span>DEPARTURE AIRPORT</span>
-            <span class="weather-symbol">☀</span>
+            <span class="weather-symbol" id="originWeatherIcon">☀</span>
           </div>
 
           <h3 id="originWeatherCode">---</h3>
@@ -147,7 +132,7 @@
         <div class="weather-card">
           <div class="weather-card-top">
             <span>ARRIVAL AIRPORT</span>
-            <span class="weather-symbol">☁</span>
+            <span class="weather-symbol" id="destinationWeatherIcon">☁</span>
           </div>
 
           <h3 id="destinationWeatherCode">---</h3>
@@ -168,7 +153,8 @@
   </footer>
 
   <script>
-    // Your AWS API Gateway URL
+    "use strict";
+
     const API_BASE_URL =
       "https://hkzcowus58.execute-api.us-east-1.amazonaws.com";
 
@@ -192,9 +178,7 @@
       }
 
       element.textContent =
-        value === undefined ||
-          value === null ||
-          value === ""
+        value === undefined || value === null || value === ""
           ? "—"
           : String(value);
     }
@@ -204,9 +188,7 @@
 
       const date = new Date(value);
 
-      if (Number.isNaN(date.getTime())) {
-        return "—";
-      }
+      if (Number.isNaN(date.getTime())) return "—";
 
       return date.toLocaleString("en-US", {
         month: "short",
@@ -218,25 +200,15 @@
     }
 
     function formatDelay(seconds) {
-      if (seconds === undefined || seconds === null) {
+      if (seconds === null || seconds === undefined) {
         return "—";
       }
 
-      const value = Number(seconds);
+      const minutes = Math.round(Number(seconds) / 60);
 
-      if (!Number.isFinite(value)) {
-        return "—";
-      }
-
-      const minutes = Math.round(value / 60);
-
-      if (minutes === 0) {
-        return "On time";
-      }
-
-      if (minutes < 0) {
-        return Math.abs(minutes) + " min early";
-      }
+      if (!Number.isFinite(minutes)) return "—";
+      if (minutes === 0) return "On time";
+      if (minutes < 0) return Math.abs(minutes) + " min early";
 
       return minutes + " min delayed";
     }
@@ -276,12 +248,22 @@
       return descriptions[code] || "Conditions unavailable";
     }
 
+    function weatherIcon(code) {
+      if (code === 0 || code === 1) return "☀";
+      if (code === 2 || code === 3) return "☁";
+      if (code === 45 || code === 48) return "🌫";
+      if (code >= 51 && code <= 67) return "🌧";
+      if (code >= 71 && code <= 86) return "❄";
+      if (code >= 95) return "⛈";
+
+      return "🌤";
+    }
+
     function displayWeather(prefix, airport) {
-      const code = airport?.airport || "---";
-
-      setText(prefix + "WeatherCode", code);
-
+      const airportCode = airport?.airport || "---";
       const weather = airport?.weather;
+
+      setText(prefix + "WeatherCode", airportCode);
 
       if (!weather || !weather.available) {
         setText(prefix + "Temp", "—");
@@ -290,31 +272,42 @@
         return;
       }
 
-      // Lambda returns measurements inside weather.conditions
       const current = weather.conditions || {};
+      const units = weather.units || {};
 
       const temperature = current.temperature_2m;
       const wind = current.wind_speed_10m;
       const humidity = current.relative_humidity_2m;
       const precipitation = current.precipitation;
-      const weatherCode = current.weather_code;
+      const code = current.weather_code;
+
+      const temperatureUnit = units.temperature_2m || "°F";
+      const windUnit = units.wind_speed_10m || "mph";
+      const precipitationUnit = units.precipitation || "mm";
 
       setText(
         prefix + "Temp",
         temperature != null
-          ? Math.round(Number(temperature)) + "°F"
+          ? Math.round(Number(temperature)) + temperatureUnit
           : "—"
       );
 
       setText(
         prefix + "Condition",
-        weatherDescription(weatherCode)
+        code != null
+          ? weatherDescription(Number(code))
+          : "Conditions unavailable"
+      );
+
+      setText(
+        prefix + "WeatherIcon",
+        code != null ? weatherIcon(Number(code)) : "🌤"
       );
 
       const details = [];
 
       if (wind != null) {
-        details.push("Wind: " + wind + " mph");
+        details.push("Wind: " + wind + " " + windUnit);
       }
 
       if (humidity != null) {
@@ -322,7 +315,9 @@
       }
 
       if (precipitation != null) {
-        details.push("Precipitation: " + precipitation + " mm");
+        details.push(
+          "Precipitation: " + precipitation + " " + precipitationUnit
+        );
       }
 
       setText(
@@ -331,107 +326,24 @@
       );
     }
 
-    async function trackFlight() {
-      const flightId = $("flightInput")
-        .value
-        .trim()
-        .toUpperCase();
-
-      if (!/^[A-Z0-9]{2,10}$/.test(flightId)) {
-        showError("Please enter a valid flight number.");
-        return;
-      }
-
-      $("results").classList.add("hidden");
-      $("errorMessage").classList.add("hidden");
-      $("loading").classList.remove("hidden");
-      $("searchBtn").disabled = true;
-
-      try {
-        const base = API_BASE_URL.replace(/\/+$/, "");
-
-        const endpoint = base.endsWith("/flight")
-          ? base
-          : base + "/flight";
-
-        const url =
-          endpoint + "?flight_id=" + encodeURIComponent(flightId);
-
-        console.log("Requesting:", url);
-
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error(
-              "Flight not found or API endpoint unavailable."
-            );
-          }
-
-          throw new Error(
-            "API request failed with status " + response.status
-          );
-        }
-
-        let data = await response.json();
-
-        // Handle an optional wrapped Lambda response.
-        if (typeof data.body === "string") {
-          data = JSON.parse(data.body);
-        } else if (
-          data.body &&
-          typeof data.body === "object"
-        ) {
-          data = data.body;
-        }
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        if (!data.flight || !data.departure || !data.arrival) {
-          throw new Error(
-            "The API returned an unexpected response format."
-          );
-        }
-
-        renderFlight(data);
-
-      } catch (error) {
-        console.error("Flight tracking error:", error);
-        showError(error.message);
-
-      } finally {
-        $("loading").classList.add("hidden");
-        $("searchBtn").disabled = false;
-      }
-    }
-
     function renderFlight(data) {
+      // Read the exact structure returned by AWS Lambda.
       const flight = data.flight;
       const origin = data.departure;
       const destination = data.arrival;
 
+      if (!flight || !origin || !destination) {
+        throw new Error("Missing flight or airport data.");
+      }
+
       setText("flightNumber", flight.number);
-      setText("flightStatus", flight.status);
+      setText("flightStatus", flight.status || "Unknown");
 
       setText("originCode", origin.airport);
+      setText("originName", origin.name || origin.city);
+
       setText("destinationCode", destination.airport);
-
-      setText(
-        "originName",
-        origin.name || origin.city || "Departure airport"
-      );
-
-      setText(
-        "destinationName",
-        destination.name || destination.city || "Arrival airport"
-      );
+      setText("destinationName", destination.name || destination.city);
 
       setText(
         "departureTime",
@@ -468,17 +380,17 @@
       displayWeather("destination", destination);
 
       const badge = $("flightStatus");
-      const statusText = String(flight.status || "").toLowerCase();
+      const status = String(flight.status || "").toLowerCase();
 
       badge.className = "flight-badge";
 
-      if (statusText.includes("cancel")) {
+      if (status.includes("cancel")) {
         badge.classList.add("cancelled");
-      } else if (statusText.includes("delay")) {
+      } else if (status.includes("delay")) {
         badge.classList.add("delayed");
       } else if (
-        statusText.includes("air") ||
-        statusText.includes("route")
+        status.includes("air") ||
+        status.includes("route")
       ) {
         badge.classList.add("airborne");
       }
@@ -486,10 +398,81 @@
       $("results").classList.remove("hidden");
     }
 
+    async function trackFlight() {
+      const flightId = $("flightInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+      if (!/^[A-Z0-9]{2,10}$/.test(flightId)) {
+        showError("Please enter a valid flight number.");
+        return;
+      }
+
+      $("results").classList.add("hidden");
+      $("errorMessage").classList.add("hidden");
+      $("loading").classList.remove("hidden");
+      $("searchBtn").disabled = true;
+
+      try {
+        const base = API_BASE_URL.replace(/\/+$/, "");
+        const endpoint = base.endsWith("/flight")
+          ? base
+          : base + "/flight";
+
+        const url =
+          endpoint + "?flight_id=" + encodeURIComponent(flightId);
+
+        console.log("Requesting flight:", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        let data = await response.json();
+
+        if (typeof data.body === "string") {
+          data = JSON.parse(data.body);
+        } else if (
+          data.body &&
+          typeof data.body === "object"
+        ) {
+          data = data.body;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+            "API request failed with status " + response.status
+          );
+        }
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        console.log("Flight data received:", data);
+
+        renderFlight(data);
+
+      } catch (error) {
+        console.error("Flight tracking error:", error);
+        showError(error.message || "Unable to retrieve flight data");
+
+      } finally {
+        $("loading").classList.add("hidden");
+        $("searchBtn").disabled = false;
+      }
+    }
+
     function showError(message) {
-      $("errorMessage").textContent = message;
+      setText("errorMessage", message);
       $("errorMessage").classList.remove("hidden");
     }
+
   </script>
 
 </body>
