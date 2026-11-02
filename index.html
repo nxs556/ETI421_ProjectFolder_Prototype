@@ -11,213 +11,151 @@
 </head>
 
 <body>
-
   <header class="navbar">
-    <a class="brand" href="./" aria-label="AeroTrack Home">
-      <span class="brand-icon">✈</span>
-      <span>Aero<span class="accent">Track</span></span>
-    </a>
-
-    <span class="nav-status">
-      <span class="status-dot"></span>
-      Live Flight Intelligence
-    </span>
+    <a class="brand" href="#" aria-label="AeroTrack home"><span class="brand-icon">✈</span><span>Aero<span
+          class="accent">Track</span></span></a>
+    <span class="nav-status"><span class="status-dot"></span>Flight intelligence</span>
   </header>
-
   <main class="container">
-
     <section class="hero">
       <div class="eyebrow">YOUR JOURNEY, SIMPLIFIED</div>
       <h1>Every flight.<br><span>One dashboard.</span></h1>
-      <p>
-        Track flights, discover routes, and check airport
-        weather in one beautiful place.
-      </p>
+      <p>Find flights, check schedules, and explore airport weather in one place.</p>
     </section>
-
-    <section class="search-panel" aria-label="Flight search">
-
-      <div class="search-tabs" role="group" aria-label="Search method">
-        <button id="flightTab" class="search-tab active" type="button" aria-pressed="true">
-          ✈ Flight Number
-        </button>
-        <button id="routeTab" class="search-tab" type="button" aria-pressed="false">
-          ◎ Airport Route
-        </button>
+    <section class="search-panel" aria-label="Search flights">
+      <div class="search-tabs" role="tablist" aria-label="Search method">
+        <button class="search-tab active" id="flightTab" type="button" role="tab" aria-selected="true"
+          aria-controls="flightSearch">Flight number</button>
+        <button class="search-tab" id="routeTab" type="button" role="tab" aria-selected="false"
+          aria-controls="routeSearch">Airport route</button>
       </div>
-
-      <form id="flightForm">
+      <form id="flightSearch" class="search-form" role="tabpanel" aria-labelledby="flightTab">
         <label for="flightInput">TRACK A FLIGHT</label>
         <div class="search-row">
-          <div class="input-wrapper">
-            <span>✈</span>
-            <input id="flightInput" type="text" placeholder="Enter flight number (e.g. AA100)" autocomplete="off"
-              maxlength="10" required>
-          </div>
-          <button class="primary-button" type="submit">
-            Track Flight →
-          </button>
+          <div class="input-wrapper"><span aria-hidden="true">✈</span><input id="flightInput"
+              placeholder="Flight number, e.g. AA100" maxlength="10" autocomplete="off" required></div>
+          <button class="action-btn" type="submit">Track flight</button>
         </div>
-        <p class="search-hint">
-          Search using an airline flight number such as AA100 or DL200.
-        </p>
+        <p class="search-hint">Enter an airline flight number to see its status and airport weather.</p>
       </form>
-
-      <form id="routeForm" class="hidden">
+      <form id="routeSearch" class="search-form hidden" role="tabpanel" aria-labelledby="routeTab">
         <div class="route-inputs">
-          <div>
-            <label for="originInput">DEPARTURE AIRPORT</label>
-            <div class="input-wrapper">
-              <span>↗</span>
-              <input id="originInput" type="text" placeholder="JFK" maxlength="4" autocomplete="off" required>
-            </div>
+          <div><label for="originInput">DEPARTURE AIRPORT</label>
+            <div class="input-wrapper"><span aria-hidden="true">↗</span><input id="originInput" placeholder="JFK"
+                maxlength="4" autocomplete="off" required></div>
           </div>
-
-          <div>
-            <label for="destinationInput">ARRIVAL AIRPORT</label>
-            <div class="input-wrapper">
-              <span>↘</span>
-              <input id="destinationInput" type="text" placeholder="LHR" maxlength="4" autocomplete="off" required>
-            </div>
+          <div><label for="destinationInput">ARRIVAL AIRPORT</label>
+            <div class="input-wrapper"><span aria-hidden="true">↘</span><input id="destinationInput" placeholder="LHR"
+                maxlength="4" autocomplete="off" required></div>
           </div>
-
-          <button class="primary-button" type="submit">
-            Find Flights →
-          </button>
+          <button class="action-btn" type="submit">Find flights</button>
         </div>
-
-        <p class="search-hint">
-          Enter airport codes to discover flights between two airports.
-        </p>
+        <p class="search-hint">Search by three or four letter airport codes, such as JFK and LHR.</p>
       </form>
     </section>
-
     <div id="errorMessage" class="error hidden" role="alert"></div>
-
-    <div id="loading" class="loading hidden" role="status">
-      <div class="spinner"></div>
-      <span id="loadingText">Searching flight information...</span>
-    </div>
-
-    <section id="routeResults" class="results hidden">
+    <div id="loading" class="loading hidden" role="status"><span class="spinner"></span><span id="loadingText">Searching
+        flights...</span></div>
+    <section id="routeResults" class="results hidden" aria-label="Matching flights">
       <div class="section-header">
-        <div>
-          <span class="eyebrow">FLIGHT DISCOVERY</span>
-          <h2 id="routeTitle">Available flights</h2>
-          <p id="routeCount" class="section-subtitle"></p>
-        </div>
+        <div><span class="eyebrow">FLIGHT DISCOVERY</span>
+          <h2 id="routeResultsTitle">Matching flights</h2>
+        </div><span id="resultCount" class="count-badge"></span>
       </div>
-
       <div id="flightList" class="flight-list"></div>
     </section>
-
-    <section id="results" class="results hidden">
-
+    <section id="results" class="results hidden" aria-label="Flight details">
       <div class="section-header">
-        <div>
-          <span class="eyebrow">FLIGHT OVERVIEW</span>
+        <div><span class="eyebrow">FLIGHT OVERVIEW</span>
           <h2 id="flightNumber">Flight</h2>
         </div>
-        <span id="flightStatus" class="flight-badge">
-          Scheduled
-        </span>
+        <span id="flightStatus" class="flight-badge">Scheduled</span>
       </div>
-
       <div class="flight-card">
         <div class="route">
-
           <div class="airport">
             <div class="airport-label">DEPARTURE</div>
             <div class="airport-code" id="originCode">---</div>
             <div class="airport-name" id="originName">Origin</div>
-            <div class="flight-time" id="departureTime">--:--</div>
+            <div class="flight-time" id="departureTime">—</div>
           </div>
-
-          <div class="route-center">
-            <span class="plane-icon">✈</span>
-            <div class="route-line"></div>
-            <span class="route-caption">FLIGHT ROUTE</span>
+          <div class="route-center"><span class="plane-icon">✈</span>
+            <div class="route-line"></div><span class="route-caption">FLIGHT ROUTE</span>
           </div>
-
           <div class="airport airport-right">
             <div class="airport-label">ARRIVAL</div>
             <div class="airport-code" id="destinationCode">---</div>
-            <div class="airport-name" id="destinationName">
-              Destination
-            </div>
-            <div class="flight-time" id="arrivalTime">--:--</div>
+            <div class="airport-name" id="destinationName">Destination</div>
+            <div class="flight-time" id="arrivalTime">—</div>
           </div>
-
         </div>
       </div>
-
       <div class="details-grid">
-
         <div class="info-card">
           <div class="info-icon">◷</div>
-          <div class="info-label">Departure Delay</div>
+          <div class="info-label">Departure delay</div>
           <div class="info-value" id="departureDelay">—</div>
         </div>
-
         <div class="info-card">
           <div class="info-icon">◷</div>
-          <div class="info-label">Arrival Delay</div>
+          <div class="info-label">Arrival delay</div>
           <div class="info-value" id="arrivalDelay">—</div>
         </div>
-
         <div class="info-card">
           <div class="info-icon">✈</div>
           <div class="info-label">Aircraft</div>
-          <div class="info-value small-value" id="aircraft">
-            Not provided
-          </div>
+          <div class="info-value small-value" id="aircraft">Not provided</div>
         </div>
-
       </div>
-
-      <div class="weather-heading">
-        <span class="eyebrow">AIRPORT CONDITIONS</span>
+      <div class="weather-heading"><span class="eyebrow">AIRPORT CONDITIONS</span>
         <h2>Weather overview</h2>
-        <p class="section-subtitle">
-          Current conditions at departure and arrival airports.
-        </p>
       </div>
-
       <div class="weather-grid">
-
         <div class="weather-card">
-          <div class="weather-card-top">
-            <span>DEPARTURE AIRPORT</span>
-            <span class="weather-symbol" id="originWeatherIcon">☀</span>
-          </div>
+          <div class="weather-card-top"><span>DEPARTURE AIRPORT</span><span class="weather-symbol"
+              id="originWeatherIcon">☀</span></div>
           <h3 id="originWeatherCode">---</h3>
-          <div class="temperature" id="originTemp">--°</div>
+          <div class="temperature" id="originTemp">—</div>
           <p id="originCondition">Weather unavailable</p>
           <div class="weather-extra" id="originWind"></div>
         </div>
-
         <div class="weather-card">
-          <div class="weather-card-top">
-            <span>ARRIVAL AIRPORT</span>
-            <span class="weather-symbol" id="destinationWeatherIcon">☁</span>
-          </div>
+          <div class="weather-card-top"><span>ARRIVAL AIRPORT</span><span class="weather-symbol"
+              id="destinationWeatherIcon">☁</span></div>
           <h3 id="destinationWeatherCode">---</h3>
-          <div class="temperature" id="destinationTemp">--°</div>
+          <div class="temperature" id="destinationTemp">—</div>
           <p id="destinationCondition">Weather unavailable</p>
           <div class="weather-extra" id="destinationWind"></div>
         </div>
-
       </div>
-
+      <div class="weather-heading"><span class="eyebrow">FLIGHT TIME FORECAST</span>
+        <h2>Weather at flight time</h2>
+        <p class="forecast-note">Hourly predictions for the departure and arrival times. Times shown in your device
+          timezone.</p>
+      </div>
+      <div class="weather-grid">
+        <div class="weather-card">
+          <div class="weather-card-top"><span>DEPARTURE FORECAST</span><span class="weather-symbol"
+              id="originForecastIcon">🌤</span></div>
+          <h3 id="originForecastCode">---</h3>
+          <div class="forecast-time" id="originForecastTime">—</div>
+          <div class="temperature" id="originForecastTemp">—</div>
+          <p id="originForecastCondition">Forecast unavailable</p>
+          <div class="weather-extra" id="originForecastDetails">—</div>
+        </div>
+        <div class="weather-card">
+          <div class="weather-card-top"><span>ARRIVAL FORECAST</span><span class="weather-symbol"
+              id="destinationForecastIcon">🌤</span></div>
+          <h3 id="destinationForecastCode">---</h3>
+          <div class="forecast-time" id="destinationForecastTime">—</div>
+          <div class="temperature" id="destinationForecastTemp">—</div>
+          <p id="destinationForecastCondition">Forecast unavailable</p>
+          <div class="weather-extra" id="destinationForecastDetails">—</div>
+        </div>
+      </div>
     </section>
-
   </main>
-
-  <footer>
-    <span>AeroTrack © 2026</span>
-    <span>Powered by FlightAware and Open-Meteo</span>
-  </footer>
-
+  <footer><span>AeroTrack © 2026</span><span>Powered by FlightAware and Open-Meteo</span></footer>
 </body>
 
 </html>
