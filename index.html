@@ -15,6 +15,7 @@
       <span class="brand-icon">✈</span>
       <span>Aero<span class="accent">Track</span></span>
     </div>
+
     <span class="nav-status">
       <span class="status-dot"></span>
       Live Flight Intelligence
@@ -26,19 +27,30 @@
     <section class="hero">
       <div class="eyebrow">YOUR JOURNEY, SIMPLIFIED</div>
       <h1>Every flight.<br><span>One dashboard.</span></h1>
-      <p>Track flight status, schedules, and airport weather in one beautiful place.</p>
+      <p>
+        Track flight status, schedules, and airport weather
+        in one beautiful place.
+      </p>
     </section>
 
     <section class="search-panel">
       <label for="flightInput">TRACK A FLIGHT</label>
+
       <div class="search-row">
         <div class="input-wrapper">
           <span>✈</span>
-          <input id="flightInput" type="text" placeholder="Enter flight number (e.g. AA100)" autocomplete="off">
+          <input id="flightInput" type="text" placeholder="Enter flight number (e.g. AA100)" autocomplete="off"
+            maxlength="10">
         </div>
-        <button id="searchBtn">Track Flight →</button>
+
+        <button id="searchBtn" type="button">
+          Track Flight →
+        </button>
       </div>
-      <p class="search-hint">Enter an airline flight number to get started.</p>
+
+      <p class="search-hint">
+        Enter an airline flight number to get started.
+      </p>
     </section>
 
     <div id="errorMessage" class="error hidden" role="alert"></div>
@@ -55,11 +67,15 @@
           <span class="eyebrow">FLIGHT OVERVIEW</span>
           <h2 id="flightNumber">Flight</h2>
         </div>
-        <span id="flightStatus" class="flight-badge">Scheduled</span>
+
+        <span id="flightStatus" class="flight-badge">
+          Scheduled
+        </span>
       </div>
 
       <div class="flight-card">
         <div class="route">
+
           <div class="airport">
             <div class="airport-label">DEPARTURE</div>
             <div class="airport-code" id="originCode">---</div>
@@ -76,13 +92,17 @@
           <div class="airport airport-right">
             <div class="airport-label">ARRIVAL</div>
             <div class="airport-code" id="destinationCode">---</div>
-            <div class="airport-name" id="destinationName">Destination</div>
+            <div class="airport-name" id="destinationName">
+              Destination
+            </div>
             <div class="flight-time" id="arrivalTime">--:--</div>
           </div>
+
         </div>
       </div>
 
       <div class="details-grid">
+
         <div class="info-card">
           <div class="info-icon">◷</div>
           <div class="info-label">Departure Delay</div>
@@ -98,8 +118,11 @@
         <div class="info-card">
           <div class="info-icon">✈</div>
           <div class="info-label">Aircraft</div>
-          <div class="info-value small-value" id="aircraft">Unknown</div>
+          <div class="info-value small-value" id="aircraft">
+            Unknown
+          </div>
         </div>
+
       </div>
 
       <div class="weather-heading">
@@ -108,11 +131,13 @@
       </div>
 
       <div class="weather-grid">
+
         <div class="weather-card">
           <div class="weather-card-top">
             <span>DEPARTURE AIRPORT</span>
             <span class="weather-symbol">☀</span>
           </div>
+
           <h3 id="originWeatherCode">---</h3>
           <div class="temperature" id="originTemp">--°</div>
           <p id="originCondition">Weather unavailable</p>
@@ -124,11 +149,13 @@
             <span>ARRIVAL AIRPORT</span>
             <span class="weather-symbol">☁</span>
           </div>
+
           <h3 id="destinationWeatherCode">---</h3>
           <div class="temperature" id="destinationTemp">--°</div>
           <p id="destinationCondition">Weather unavailable</p>
           <div class="weather-extra" id="destinationWind"></div>
         </div>
+
       </div>
 
     </section>
@@ -137,62 +164,81 @@
 
   <footer>
     <span>AeroTrack © 2026</span>
-    <span>Powered by live aviation and weather data</span>
+    <span>Powered by FlightAware and Open-Meteo</span>
   </footer>
 
   <script>
-    const API_BASE_URL = "https://hkzcowus58.execute-api.us-east-1.amazonaws.com/";
+    // Your AWS API Gateway URL
+    const API_BASE_URL =
+      "https://hkzcowus58.execute-api.us-east-1.amazonaws.com";
 
     const $ = id => document.getElementById(id);
 
     $("searchBtn").addEventListener("click", trackFlight);
 
     $("flightInput").addEventListener("keydown", event => {
-      if (event.key === "Enter") trackFlight();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        trackFlight();
+      }
     });
 
     function setText(id, value) {
-      $(id).textContent =
-        value === undefined || value === null || value === ""
+      const element = $(id);
+
+      if (!element) {
+        console.warn("Missing HTML element:", id);
+        return;
+      }
+
+      element.textContent =
+        value === undefined ||
+          value === null ||
+          value === ""
           ? "—"
           : String(value);
     }
 
-    function first(...values) {
-      return values.find(v =>
-        v !== undefined && v !== null && v !== ""
-      );
-    }
-
     function formatTime(value) {
       if (!value) return "—";
+
       const date = new Date(value);
-      if (isNaN(date.getTime())) return String(value);
-      return date.toLocaleTimeString([], {
+
+      if (Number.isNaN(date.getTime())) {
+        return "—";
+      }
+
+      return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
         hour: "numeric",
         minute: "2-digit",
         timeZoneName: "short"
       });
     }
 
-    function formatDelay(value) {
-      if (value === undefined || value === null) return "—";
-      const minutes = Number(value);
-      if (!Number.isFinite(minutes)) return String(value);
-      if (minutes <= 0) return "On time";
-      return `${Math.round(minutes)} min`;
-    }
+    function formatDelay(seconds) {
+      if (seconds === undefined || seconds === null) {
+        return "—";
+      }
 
-    function airportCode(value) {
-      if (typeof value === "string") return value;
-      return first(
-        value?.code,
-        value?.iata,
-        value?.iata_code,
-        value?.icao,
-        value?.icao_code,
-        "---"
-      );
+      const value = Number(seconds);
+
+      if (!Number.isFinite(value)) {
+        return "—";
+      }
+
+      const minutes = Math.round(value / 60);
+
+      if (minutes === 0) {
+        return "On time";
+      }
+
+      if (minutes < 0) {
+        return Math.abs(minutes) + " min early";
+      }
+
+      return minutes + " min delayed";
     }
 
     function weatherDescription(code) {
@@ -206,59 +252,93 @@
         51: "Light drizzle",
         53: "Drizzle",
         55: "Dense drizzle",
+        56: "Freezing drizzle",
+        57: "Freezing drizzle",
         61: "Light rain",
         63: "Rain",
         65: "Heavy rain",
+        66: "Freezing rain",
+        67: "Heavy freezing rain",
         71: "Light snow",
         73: "Snow",
         75: "Heavy snow",
-        80: "Rain showers",
+        77: "Snow grains",
+        80: "Light rain showers",
         81: "Rain showers",
-        82: "Heavy showers",
-        95: "Thunderstorm"
+        82: "Heavy rain showers",
+        85: "Snow showers",
+        86: "Heavy snow showers",
+        95: "Thunderstorm",
+        96: "Thunderstorm with hail",
+        99: "Severe thunderstorm with hail"
       };
-      return descriptions[code] || "Conditions available";
+
+      return descriptions[code] || "Conditions unavailable";
     }
 
-    function displayWeather(prefix, airport, weather) {
-      setText(prefix + "WeatherCode", airport);
+    function displayWeather(prefix, airport) {
+      const code = airport?.airport || "---";
 
-      const current = weather?.current || weather?.current_weather || weather || {};
-      const temp = first(
-        current.temperature_2m,
-        current.temperature,
-        current.temp,
-        weather?.temperature
-      );
+      setText(prefix + "WeatherCode", code);
 
-      const wind = first(
-        current.wind_speed_10m,
-        current.windspeed,
-        current.wind_speed
-      );
+      const weather = airport?.weather;
 
-      const code = first(current.weather_code, current.weathercode);
-      const description = first(
-        current.description,
-        current.condition,
-        code !== undefined ? weatherDescription(code) : null
-      );
-
-      setText(prefix + "Temp", temp === undefined ? "—" : `${Math.round(Number(temp))}°`);
-      setText(prefix + "Condition", description || "Weather unavailable");
-      setText(prefix + "Wind", wind === undefined ? "" : `Wind: ${wind} km/h`);
-    }
-
-    async function trackFlight() {
-      const flightId = $("flightInput").value.trim().toUpperCase();
-
-      if (!flightId) {
-        showError("Please enter a flight number.");
+      if (!weather || !weather.available) {
+        setText(prefix + "Temp", "—");
+        setText(prefix + "Condition", "Weather unavailable");
+        setText(prefix + "Wind", "No weather data available");
         return;
       }
 
-      if (API_BASE_URL.includes("PASTE_YOUR")) {
-        showError("Add your AWS API Gateway URL in index.html first.");
+      // Lambda returns measurements inside weather.conditions
+      const current = weather.conditions || {};
+
+      const temperature = current.temperature_2m;
+      const wind = current.wind_speed_10m;
+      const humidity = current.relative_humidity_2m;
+      const precipitation = current.precipitation;
+      const weatherCode = current.weather_code;
+
+      setText(
+        prefix + "Temp",
+        temperature != null
+          ? Math.round(Number(temperature)) + "°F"
+          : "—"
+      );
+
+      setText(
+        prefix + "Condition",
+        weatherDescription(weatherCode)
+      );
+
+      const details = [];
+
+      if (wind != null) {
+        details.push("Wind: " + wind + " mph");
+      }
+
+      if (humidity != null) {
+        details.push("Humidity: " + humidity + "%");
+      }
+
+      if (precipitation != null) {
+        details.push("Precipitation: " + precipitation + " mm");
+      }
+
+      setText(
+        prefix + "Wind",
+        details.length ? details.join(" | ") : "Unavailable"
+      );
+    }
+
+    async function trackFlight() {
+      const flightId = $("flightInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+      if (!/^[A-Z0-9]{2,10}$/.test(flightId)) {
+        showError("Please enter a valid flight number.");
         return;
       }
 
@@ -269,124 +349,129 @@
 
       try {
         const base = API_BASE_URL.replace(/\/+$/, "");
-        const root = base.endsWith("/flight") ? base : `${base}/flight`;
-        const url = `${root}?flight_id=${encodeURIComponent(flightId)}`;
 
-        const response = await fetch(url);
+        const endpoint = base.endsWith("/flight")
+          ? base
+          : base + "/flight";
+
+        const url =
+          endpoint + "?flight_id=" + encodeURIComponent(flightId);
+
+        console.log("Requesting:", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
 
         if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`);
+          if (response.status === 404) {
+            throw new Error(
+              "Flight not found or API endpoint unavailable."
+            );
+          }
+
+          throw new Error(
+            "API request failed with status " + response.status
+          );
         }
 
         let data = await response.json();
 
-        // Supports an API Gateway response containing a JSON body.
+        // Handle an optional wrapped Lambda response.
         if (typeof data.body === "string") {
           data = JSON.parse(data.body);
-        } else if (data.body && typeof data.body === "object") {
+        } else if (
+          data.body &&
+          typeof data.body === "object"
+        ) {
           data = data.body;
         }
 
-        if (data.error || data.message === "not found") {
-          throw new Error(data.error || "Flight not found.");
+        if (data.error) {
+          throw new Error(data.error);
         }
 
-        renderFlight(data, flightId);
+        if (!data.flight || !data.departure || !data.arrival) {
+          throw new Error(
+            "The API returned an unexpected response format."
+          );
+        }
+
+        renderFlight(data);
 
       } catch (error) {
-        console.error(error);
-        showError(
-          error instanceof TypeError
-            ? "Could not connect to the API. Check your endpoint and CORS configuration."
-            : error.message
-        );
+        console.error("Flight tracking error:", error);
+        showError(error.message);
+
       } finally {
         $("loading").classList.add("hidden");
         $("searchBtn").disabled = false;
       }
     }
 
-    function renderFlight(data, requestedId) {
-      const flight = data.flight || data;
-      const origin = first(flight.origin, flight.departure_airport);
-      const destination = first(flight.destination, flight.arrival_airport);
+    function renderFlight(data) {
+      const flight = data.flight;
+      const origin = data.departure;
+      const destination = data.arrival;
 
-      const originCode = first(
-        flight.origin_code,
-        airportCode(origin),
-        "---"
-      );
-      const destinationCode = first(
-        flight.destination_code,
-        airportCode(destination),
-        "---"
-      );
+      setText("flightNumber", flight.number);
+      setText("flightStatus", flight.status);
 
-      const status = first(flight.status, "Unknown");
+      setText("originCode", origin.airport);
+      setText("destinationCode", destination.airport);
 
-      setText("flightNumber", first(flight.number, flight.ident, requestedId));
-      setText("flightStatus", status);
-      setText("originCode", originCode);
-      setText("destinationCode", destinationCode);
-
-      setText("originName",
-        first(origin?.name, flight.origin_name, "Departure airport")
-      );
-      setText("destinationName",
-        first(destination?.name, flight.destination_name, "Arrival airport")
+      setText(
+        "originName",
+        origin.name || origin.city || "Departure airport"
       );
 
-      setText("departureTime", formatTime(first(
-        flight.estimated_departure,
-        flight.scheduled_departure,
-        flight.departure_time
-      )));
+      setText(
+        "destinationName",
+        destination.name || destination.city || "Arrival airport"
+      );
 
-      setText("arrivalTime", formatTime(first(
-        flight.estimated_arrival,
-        flight.scheduled_arrival,
-        flight.arrival_time
-      )));
-
-      setText("departureDelay", formatDelay(flight.departure_delay));
-      setText("arrivalDelay", formatDelay(flight.arrival_delay));
-
-      setText("aircraft", first(
-        flight.aircraft_type,
-        flight.aircraft,
-        "Unknown"
-      ));
-
-      const weather = data.weather || {};
-
-      displayWeather(
-        "origin",
-        originCode,
-        first(
-          data.departure_weather,
-          data.origin_weather,
-          weather.departure,
-          weather.origin,
-          {}
+      setText(
+        "departureTime",
+        formatTime(
+          flight.estimated_departure ||
+          flight.scheduled_departure
         )
       );
 
-      displayWeather(
-        "destination",
-        destinationCode,
-        first(
-          data.arrival_weather,
-          data.destination_weather,
-          weather.arrival,
-          weather.destination,
-          {}
+      setText(
+        "arrivalTime",
+        formatTime(
+          flight.estimated_arrival ||
+          flight.scheduled_arrival
         )
       );
+
+      setText(
+        "departureDelay",
+        formatDelay(flight.departure_delay_seconds)
+      );
+
+      setText(
+        "arrivalDelay",
+        formatDelay(flight.arrival_delay_seconds)
+      );
+
+      setText(
+        "aircraft",
+        flight.aircraft_type || "Not provided"
+      );
+
+      displayWeather("origin", origin);
+      displayWeather("destination", destination);
 
       const badge = $("flightStatus");
-      const statusText = String(status).toLowerCase();
+      const statusText = String(flight.status || "").toLowerCase();
 
       badge.className = "flight-badge";
+
       if (statusText.includes("cancel")) {
         badge.classList.add("cancelled");
       } else if (statusText.includes("delay")) {
