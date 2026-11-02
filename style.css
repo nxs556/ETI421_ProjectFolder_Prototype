@@ -16,8 +16,13 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
+    min-height: 100vh;
     background: var(--bg);
     background-image: radial-gradient(ellipse at 50% 0%,
             #152948 0%,
@@ -25,11 +30,24 @@ body {
     background-repeat: no-repeat;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
 }
 
 .hidden {
     display: none !important;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: wait;
 }
 
 /* Navigation */
@@ -45,23 +63,25 @@ body {
 }
 
 .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    text-decoration: none;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 25px;
     font-weight: 700;
     letter-spacing: -1px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .brand-icon {
-    background: var(--primary);
-    color: #07101f;
     width: 38px;
     height: 38px;
-    border-radius: 12px;
     display: grid;
     place-items: center;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #07101f;
     font-size: 22px;
 }
 
@@ -70,22 +90,22 @@ body {
 }
 
 .nav-status {
-    color: var(--muted);
-    font-size: 13px;
     display: flex;
     align-items: center;
     gap: 9px;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 .status-dot {
-    height: 8px;
     width: 8px;
-    background: var(--green);
+    height: 8px;
     border-radius: 50%;
+    background: var(--green);
     box-shadow: 0 0 13px var(--green);
 }
 
-/* Main content */
+/* Layout */
 
 .container {
     width: 90%;
@@ -107,11 +127,11 @@ body {
 }
 
 .hero h1 {
+    margin: 22px 0;
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(44px, 7vw, 76px);
     line-height: 1.1;
     letter-spacing: -3px;
-    margin: 22px 0;
 }
 
 .hero h1 span {
@@ -119,30 +139,62 @@ body {
 }
 
 .hero p {
-    color: var(--muted);
-    line-height: 1.7;
-    font-size: 16px;
     max-width: 480px;
     margin: 0 auto;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
 }
 
-/* Search */
+/* Search panel */
 
 .search-panel {
     padding: 28px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .15);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.search-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding: 5px;
+    background: #0b1424;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+}
+
+.search-tab {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.search-tab:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.search-tab.active {
+    background: var(--primary);
+    color: #061323;
 }
 
 .search-panel label {
     display: block;
+    margin-bottom: 14px;
+    color: var(--muted);
     font-size: 11px;
     font-weight: 800;
-    color: var(--muted);
     letter-spacing: 1.6px;
-    margin-bottom: 14px;
 }
 
 .search-row {
@@ -155,11 +207,12 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-width: 0;
+    padding: 0 17px;
     background: #0b1424;
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 0 17px;
-    transition: border .2s;
+    transition: border 0.2s;
 }
 
 .input-wrapper:focus-within {
@@ -173,56 +226,58 @@ body {
 
 input {
     width: 100%;
+    min-width: 0;
     padding: 17px 0;
     border: none;
     outline: none;
     background: transparent;
     color: white;
-    font: inherit;
     font-size: 15px;
-    min-width: 0;
 }
 
 input::placeholder {
     color: #72829a;
 }
 
-button {
-    background: var(--primary);
-    color: #061323;
+.primary-button {
+    padding: 16px 28px;
     border: none;
     border-radius: 12px;
-    padding: 0 28px;
-    font-family: inherit;
-    font-weight: 800;
+    background: var(--primary);
+    color: #061323;
     font-size: 14px;
-    cursor: pointer;
-    transition: .2s;
+    font-weight: 800;
     white-space: nowrap;
+    transition: 0.2s;
 }
 
-button:hover {
+.primary-button:hover {
     background: #82bdff;
     transform: translateY(-2px);
 }
 
-button:disabled {
-    opacity: .5;
-    cursor: wait;
-    transform: none;
-}
-
 .search-hint {
+    margin: 13px 0 0;
     color: var(--muted);
     font-size: 12px;
-    margin: 13px 0 0;
+}
+
+.route-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.route-inputs>div {
+    min-width: 0;
 }
 
 /* Results */
 
 .results {
     margin-top: 58px;
-    animation: appear .4s ease;
+    animation: appear 0.4s ease;
 }
 
 @keyframes appear {
@@ -241,51 +296,61 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
     margin-bottom: 20px;
 }
 
 h2 {
+    margin: 8px 0 0;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 28px;
     letter-spacing: -1px;
-    margin: 8px 0 0;
+}
+
+.section-subtitle {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 .flight-badge {
-    color: #60dfb6;
-    background: rgba(65, 215, 171, .1);
-    border: 1px solid rgba(65, 215, 171, .25);
+    display: inline-block;
     padding: 9px 17px;
-    font-weight: 700;
-    font-size: 12px;
+    border: 1px solid rgba(65, 215, 171, 0.25);
     border-radius: 100px;
+    background: rgba(65, 215, 171, 0.1);
+    color: #60dfb6;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .flight-badge.delayed {
     color: #ffc56f;
-    background: rgba(255, 197, 111, .1);
-    border-color: rgba(255, 197, 111, .25);
+    background: rgba(255, 197, 111, 0.1);
+    border-color: rgba(255, 197, 111, 0.25);
 }
 
 .flight-badge.cancelled {
     color: #ff8f98;
-    background: rgba(255, 100, 120, .1);
-    border-color: rgba(255, 100, 120, .25);
+    background: rgba(255, 100, 120, 0.1);
+    border-color: rgba(255, 100, 120, 0.25);
 }
 
 .flight-badge.airborne {
     color: #85bfff;
-    background: rgba(79, 156, 255, .1);
-    border-color: rgba(79, 156, 255, .25);
+    background: rgba(79, 156, 255, 0.1);
+    border-color: rgba(79, 156, 255, 0.25);
 }
 
+/* Main flight card */
+
 .flight-card {
-    background: linear-gradient(135deg,
-            #172943,
-            #101b2d);
+    padding: 45px 44px;
+    background: linear-gradient(135deg, #172943, #101b2d);
     border: 1px solid #304561;
     border-radius: 22px;
-    padding: 45px 44px;
 }
 
 .route {
@@ -312,11 +377,11 @@ h2 {
 }
 
 .airport-code {
+    margin: 12px 0 5px;
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(38px, 7vw, 64px);
     font-weight: 700;
     letter-spacing: -2px;
-    margin: 12px 0 5px;
 }
 
 .airport-name {
@@ -333,9 +398,9 @@ h2 {
 
 .route-center {
     flex: 1;
+    min-width: 60px;
     text-align: center;
     color: var(--primary);
-    min-width: 60px;
 }
 
 .plane-icon {
@@ -367,11 +432,11 @@ h2 {
 }
 
 .info-card {
+    padding: 25px;
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 25px;
     border-radius: 17px;
-    transition: .2s;
+    transition: 0.2s;
 }
 
 .info-card:hover,
@@ -381,9 +446,9 @@ h2 {
 }
 
 .info-icon {
-    font-size: 23px;
-    color: var(--primary);
     margin-bottom: 18px;
+    color: var(--primary);
+    font-size: 23px;
 }
 
 .info-label {
@@ -394,8 +459,8 @@ h2 {
 .info-value {
     margin-top: 7px;
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
     font-size: 23px;
+    font-weight: 700;
 }
 
 .small-value {
@@ -415,21 +480,21 @@ h2 {
 }
 
 .weather-card {
+    padding: 29px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 29px;
-    transition: .2s;
+    transition: 0.2s;
 }
 
 .weather-card-top {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     color: var(--muted);
     font-size: 11px;
-    letter-spacing: 1px;
     font-weight: 700;
+    letter-spacing: 1px;
 }
 
 .weather-symbol {
@@ -438,9 +503,9 @@ h2 {
 }
 
 .weather-card h3 {
+    margin: 25px 0 10px;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 25px;
-    margin: 25px 0 10px;
 }
 
 .temperature {
@@ -455,9 +520,118 @@ h2 {
 }
 
 .weather-extra {
-    font-size: 12px;
-    color: var(--primary-light);
     margin-top: 18px;
+    color: var(--primary-light);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* Airport search result cards */
+
+.flight-list {
+    display: grid;
+    gap: 14px;
+}
+
+.route-result-card {
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    transition: 0.2s;
+}
+
+.route-result-card:hover {
+    background: var(--surface-hover);
+    border-color: #405b7d;
+}
+
+.result-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.result-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.result-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.result-airport {
+    flex: 1;
+    min-width: 0;
+}
+
+.result-airport.right {
+    text-align: right;
+}
+
+.result-code {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 29px;
+    font-weight: 700;
+}
+
+.result-time {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.result-plane {
+    color: var(--primary);
+    font-size: 25px;
+}
+
+.result-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 23px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.result-delay {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.details-button {
+    padding: 11px 17px;
+    background: rgba(79, 156, 255, 0.12);
+    color: var(--primary-light);
+    border: 1px solid rgba(79, 156, 255, 0.3);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    transition: 0.2s;
+}
+
+.details-button:hover {
+    background: var(--primary);
+    color: #061323;
+}
+
+.empty-results {
+    padding: 35px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--surface);
+    color: var(--muted);
+    text-align: center;
 }
 
 /* Loading and errors */
@@ -482,12 +656,12 @@ h2 {
 }
 
 .spinner {
-    height: 22px;
     width: 22px;
+    height: 22px;
     border: 3px solid #263e59;
     border-top-color: var(--primary);
     border-radius: 50%;
-    animation: spin .7s linear infinite;
+    animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
@@ -499,12 +673,12 @@ h2 {
 /* Footer */
 
 footer {
-    padding: 28px 6%;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
     display: flex;
     justify-content: space-between;
     gap: 18px;
+    padding: 28px 6%;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
     font-size: 12px;
 }
 
@@ -535,7 +709,12 @@ footer {
         flex-direction: column;
     }
 
-    button {
+    .route-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .primary-button {
+        width: 100%;
         padding: 17px;
     }
 
@@ -561,6 +740,15 @@ footer {
 
     .weather-grid {
         grid-template-columns: 1fr;
+    }
+
+    .result-code {
+        font-size: 24px;
+    }
+
+    .result-top,
+    .result-bottom {
+        flex-wrap: wrap;
     }
 
     footer {
