@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <title>AeroTrack | Forecast</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="config.js" defer></script>
+    <script src="auth.js" defer></script>
+    <script src="forecast.js" defer></script>
+  </head>
+  <body>
+    <header class="navbar">
+      <a href="index.html" class="brand"
+        ><span class="brand_icon">✈</span> Aero<span class="brand_blue"
+          >Track</span
+        ></a
+      >
+      <nav class="nav_links">
+        <a href="index.html">Flights</a
+        ><a href="forecast.html" aria-current="page">Forecast</a>
+      </nav>
+      <div class="nav_right">
+        <span id="auth_status" class="subtle">Checking access…</span
+        ><button id="login_button" class="button_outline hidden" type="button">
+          Sign in</button
+        ><button id="logout_button" class="button_outline hidden" type="button">
+          Sign out
+        </button>
+      </div>
+    </header>
+    <main class="container">
+      <section class="hero hero_short">
+        <span class="eyebrow">PLAN AHEAD</span>
+        <h1>Airport <span>forecast</span></h1>
+        <p>
+          Compare the weather near your departure and arrival airports for the
+          coming days.
+        </p>
+      </section>
+      <div id="auth_notice" class="notice hidden"></div>
+      <div id="app_content" class="hidden">
+        <section class="panel search_panel">
+          <div class="route_fields forecast_fields">
+            <div>
+              <label for="origin_input">Departure airport or city</label
+              ><input id="origin_input" placeholder="e.g. JFK or New York" />
+            </div>
+            <div>
+              <label for="destination_input">Arrival airport or city</label
+              ><input id="destination_input" placeholder="e.g. LHR or London" />
+            </div>
+            <button id="forecast_search" class="button_primary" type="button">
+              Get forecast →
+            </button>
+          </div>
+          <div class="forecast_controls">
+            <span class="helper">Forecast length</span>
+            <div class="segmented">
+              <button id="three_days" type="button">3 days</button
+              ><button id="five_days" class="active" type="button">
+                5 days
+              </button>
+            </div>
+          </div>
+          <p class="helper">
+            When exact airport coordinates are unavailable, the forecast uses a
+            nearby city and is labeled as an approximation.
+          </p>
+        </section>
+        <div id="forecast_error" class="error hidden" role="alert"></div>
+        <div id="forecast_loading" class="loading hidden">
+          <span class="spinner"></span>Retrieving forecast…
+        </div>
+        <div id="forecast_results" class="forecast_results"></div>
+      </div>
+    </main>
+    <footer>AeroTrack © 2026 · Forecast from Open Meteo</footer>
+  </body>
+</html>

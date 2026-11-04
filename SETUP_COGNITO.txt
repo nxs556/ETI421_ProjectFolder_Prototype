@@ -1,0 +1,52 @@
+AEROTRACK COGNITO SETUP
+
+Configured with the user pool and public SPA app client provided in the chat.
+Your GitHub Pages return URL:
+https://nxs556.github.io/ETI421_ProjectFolder_Prototype/
+
+1. AWS Cognito > User pool > Applications > App clients > AeroTrack:
+   Confirm allowed callback URL and allowed sign-out URL BOTH include exactly:
+   https://nxs556.github.io/ETI421_ProjectFolder_Prototype/
+   Confirm authorization code grant and scopes openid and email are enabled.
+   App client must be a public SPA client WITHOUT A CLIENT SECRET.
+   If public registration is disabled, create a test user under Users.
+   On first login, Cognito might require a password change.
+
+2. Upload ALL website files to the root of your GitHub Pages repository.
+   The config.js file already has require_auth: true and your public IDs.
+   Visit the GitHub Pages website and click Sign in.
+   After login, the website should return with a valid browser session.
+
+3. IMPORTANT: The dashboard is hidden from unsigned users, but GitHub Pages files
+   stay PUBLIC. To prevent anyone calling the API directly, do this in AWS:
+
+   API Gateway > APIs > select HTTP API for
+   https://hkzcowus58.execute-api.us-east-1.amazonaws.com
+   Authorization > Manage authorizers > Create > JWT
+   Name: AeroTrackCognito
+   Identity source: $request.header.Authorization
+   Issuer URL: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_kpx86Uq0A
+   Audience: 1aq9jniorrkqhn2tqadjrrfnkf
+   Save, then attach this authorizer to GET /flight AND GET /search.
+   For these specific routes, scopes can be left blank if using standard openid/email
+   scopes. For stronger access token restriction, define a custom API scope and require it.
+   Ensure the deployed stage receives the route changes.
+
+4. API Gateway > CORS:
+   Allowed origin: https://nxs556.github.io
+   Allowed methods: GET and OPTIONS
+   Allowed headers: authorization, content-type, accept
+   Update stage as necessary.
+   The browser must be allowed to send Authorization: Bearer <access token>.
+
+5. Check the sign-out button. If Cognito reports an invalid logout URL, revisit step 1.
+
+SECURITY NOTES
+Do not put an AeroAPI key, client secret or password in GitHub code.
+Cognito login does NOT make GitHub Pages HTML private.
+Check both API routes are protected before public sharing.
+A separate Open Meteo forecast endpoint is called directly by the browser.
+Frontend tokens are held in browser sessionStorage, which reduces persistence but
+is still accessible to injected JavaScript. Avoid untrusted third-party scripts.
+Tokens expire and this starter implementation requests another login rather than
+silently renewing the token.
