@@ -204,8 +204,13 @@
   const storage_key = "aero_selected_flight_context_v2";
   const code_text = (value) =>
     typeof value === "string" ? value.trim().toUpperCase() : "";
-  const first = (...values) =>
-    values.find((v) => v !== undefined && v !== null && v !== "");
+  const valid_id = (value) =>
+    value !== undefined &&
+    value !== null &&
+    !["", "undefined", "null", "none", "nan"].includes(
+      String(value).trim().toLowerCase(),
+    );
+  const first = (...values) => values.find(valid_id);
   const number_or_null = (value) => {
     if (value === null || value === undefined || value === "") return null;
     const number = Number(value);
@@ -358,11 +363,10 @@
         flight.flightaware_id,
         flight.flight_id,
         flight.id,
-        "",
-      ),
+      ) || "",
     ).trim();
     const lookup_id = String(
-      first(unique_id, requested_id, flight.ident, flight.number, ""),
+      first(unique_id, requested_id, flight.ident, flight.number) || "",
     );
     return {
       version: 2,
@@ -401,6 +405,8 @@
     try {
       const context = JSON.parse(sessionStorage.getItem(storage_key) || "null");
       if (!context || context.version !== 2) return null;
+      if (!valid_id(context.lookup_id) && !valid_id(context.number))
+        return null;
       if (!requested_id) return null;
       const requested = String(requested_id).toUpperCase();
       const matches = [
@@ -408,14 +414,24 @@
         context.lookup_id,
         context.requested_id,
         context.number,
-      ].some((value) => String(value || "").toUpperCase() === requested);
+      ].some(
+        (value) => valid_id(value) && String(value).toUpperCase() === requested,
+      );
       return matches ? context : null;
     } catch {
       return null;
     }
   }
   function forecast_url(context) {
-    return `forecast.html?flight_id=${encodeURIComponent(context.unique_id || context.lookup_id || context.number)}`;
+    const id = first(
+      context.unique_id,
+      context.lookup_id,
+      context.requested_id,
+      context.number,
+    );
+    return valid_id(id)
+      ? `forecast.html?flight_id=${encodeURIComponent(id)}`
+      : "forecast.html";
   }
   window.aero_flight_context = {
     build,

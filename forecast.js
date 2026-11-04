@@ -252,7 +252,11 @@ async function load_flight_context() {
   const flight_id = new URLSearchParams(location.search)
     .get("flight_id")
     ?.trim();
-  if (!flight_id) return; // The plain Forecast navigation is always a fresh, manual search.
+  if (
+    !flight_id ||
+    ["undefined", "null", "nan"].includes(flight_id.toLowerCase())
+  )
+    return; // Do not fetch an invalid identifier.
   by_id("forecast_loading").classList.remove("hidden");
   by_id("forecast_error").classList.add("hidden");
   try {
