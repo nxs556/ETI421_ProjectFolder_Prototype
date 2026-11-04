@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="config.js" defer></script>
     <script src="auth.js" defer></script>
+    <script src="flight_context.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -19,7 +20,7 @@
       >
       <nav class="nav_links">
         <a href="index.html" aria-current="page">Flights</a
-        ><a href="forecast.html">Forecast</a>
+        ><a id="nav_forecast_link" href="forecast.html">Forecast</a>
       </nav>
       <div class="nav_right">
         <span id="auth_status" class="subtle">Checking access…</span
@@ -67,7 +68,7 @@
                 placeholder="e.g. AA100 or AAL100"
                 autocomplete="off"
                 required
-                maxlength="25"
+                maxlength="110"
               /><button class="button_primary action_button" type="submit">
                 Find flight →
               </button>
@@ -135,6 +136,7 @@
             <div>
               <span class="eyebrow">FLIGHT DETAILS</span>
               <h2 id="flight_number">Flight</h2>
+              <p id="flight_identity" class="helper flight_identity"></p>
             </div>
             <span id="flight_status" class="flight_badge">Unknown</span>
           </div>
@@ -171,13 +173,21 @@
               <span class="tiny">AIRCRAFT</span><strong id="aircraft">—</strong>
             </div>
           </div>
+          <div
+            id="flight_airport_notice"
+            class="notice hidden"
+            role="status"
+          ></div>
           <div class="section_title weather_title">
             <div>
               <span class="eyebrow">CURRENT CONDITIONS</span>
               <h2>Airport weather</h2>
             </div>
-            <a href="forecast.html" class="button_outline link_button"
-              >View 5 day forecast ↗</a
+            <a
+              id="flight_forecast_link"
+              href="forecast.html"
+              class="button_outline link_button"
+              >Forecast for this flight ↗</a
             >
           </div>
           <div class="weather_grid">

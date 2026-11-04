@@ -1,7 +1,8 @@
+
 "use strict";
 
 const API_BASE_URL = window.AEROTRACK_CONFIG.api_base_url;
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 const flightTab = $("flight_tab");
 const routeTab = $("route_tab");
@@ -46,7 +47,7 @@ function formatTime(value) {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-    timeZoneName: "short",
+    timeZoneName: "short"
   });
 }
 
@@ -90,7 +91,7 @@ function weatherDescription(code) {
     86: "Heavy snow showers",
     95: "Thunderstorm",
     96: "Thunderstorm with hail",
-    99: "Severe thunderstorm with hail",
+    99: "Severe thunderstorm with hail"
   };
 
   return labels[code] || "Conditions unavailable";
@@ -125,23 +126,26 @@ function displayWeather(prefix, airport) {
     prefix + "_temp",
     current.temperature_2m == null
       ? "—"
-      : `${Math.round(Number(current.temperature_2m))}${units.temperature_2m || "°F"}`,
+      : `${Math.round(Number(current.temperature_2m))}${units.temperature_2m || "°F"}`
   );
 
   setText(
     prefix + "_condition",
     current.weather_code == null
       ? "Conditions unavailable"
-      : weatherDescription(Number(current.weather_code)),
+      : weatherDescription(Number(current.weather_code))
   );
 
-  setText(prefix + "_weather_icon", weatherIcon(Number(current.weather_code)));
+  setText(
+    prefix + "_weather_icon",
+    weatherIcon(Number(current.weather_code))
+  );
 
   const details = [];
 
   if (current.wind_speed_10m != null) {
     details.push(
-      `Wind: ${current.wind_speed_10m} ${units.wind_speed_10m || "mph"}`,
+      `Wind: ${current.wind_speed_10m} ${units.wind_speed_10m || "mph"}`
     );
   }
 
@@ -151,7 +155,7 @@ function displayWeather(prefix, airport) {
 
   if (current.precipitation != null) {
     details.push(
-      `Precipitation: ${current.precipitation} ${units.precipitation || "mm"}`,
+      `Precipitation: ${current.precipitation} ${units.precipitation || "mm"}`
     );
   }
 
@@ -165,7 +169,9 @@ function displayForecast(prefix, airport) {
 
   setText(
     prefix + "_forecast_icon",
-    forecast?.available ? weatherIcon(Number(forecast.weather_code)) : "🌤",
+    forecast?.available
+      ? weatherIcon(Number(forecast.weather_code))
+      : "🌤"
   );
 
   if (!forecast?.available) {
@@ -173,7 +179,7 @@ function displayForecast(prefix, airport) {
     setText(prefix + "_forecast_temp", "—");
     setText(
       prefix + "_forecast_condition",
-      forecast?.message || "Forecast unavailable",
+      forecast?.message || "Forecast unavailable"
     );
     setText(prefix + "_forecast_details", "No forecast data available");
     return;
@@ -181,91 +187,95 @@ function displayForecast(prefix, airport) {
 
   setText(
     prefix + "_forecast_time",
-    "Forecast hour: " + formatTime(forecast.forecast_time),
+    "Forecast hour: " + formatTime(forecast.forecast_time)
   );
 
   setText(
     prefix + "_forecast_temp",
     forecast.temperature == null
       ? "—"
-      : `${Math.round(Number(forecast.temperature))}${forecast.temperature_unit || "°F"}`,
+      : `${Math.round(Number(forecast.temperature))}${forecast.temperature_unit || "°F"}`
   );
 
   setText(
     prefix + "_forecast_condition",
     forecast.weather_code == null
       ? "Conditions unavailable"
-      : weatherDescription(Number(forecast.weather_code)),
+      : weatherDescription(Number(forecast.weather_code))
   );
 
   const details = [];
 
   if (forecast.wind_speed != null) {
-    details.push(`Wind: ${forecast.wind_speed} ${forecast.wind_unit || "mph"}`);
+    details.push(
+      `Wind: ${forecast.wind_speed} ${forecast.wind_unit || "mph"}`
+    );
   }
 
   if (forecast.precipitation_probability != null) {
-    details.push(`Rain/snow chance: ${forecast.precipitation_probability}%`);
+    details.push(
+      `Rain/snow chance: ${forecast.precipitation_probability}%`
+    );
   }
 
   setText(
     prefix + "_forecast_details",
-    details.join(" | ") || "Forecast details unavailable",
+    details.join(" | ") || "Forecast details unavailable"
   );
 }
 
-function renderFlight(data) {
+function renderFlight(data, requested_id) {
   const { flight, departure, arrival } = data;
 
   if (!flight || !departure || !arrival) {
     throw new Error("Incomplete flight details received.");
   }
+  // Build one authoritative snapshot from the flight API response.
+  const context = window.aero_flight_context.build(data, requested_id);
 
-  setText("flight_number", flight.number);
+  setText("flight_number", context.number);
   setText("flight_status", flight.status || "Unknown");
-  setText("origin_code", departure.airport);
-  setText("origin_name", departure.name || departure.city);
-  setText("destination_code", arrival.airport);
-  setText("destination_name", arrival.name || arrival.city);
+  setText("origin_code", context.origin.code || departure.airport);
+  setText("origin_name", context.origin.name || context.origin.city || departure.name || departure.city);
+  setText("destination_code", context.destination.code || arrival.airport);
+  setText("destination_name", context.destination.name || context.destination.city || arrival.name || arrival.city);
 
   setText(
     "departure_time",
-    formatTime(flight.estimated_departure || flight.scheduled_departure),
+    formatTime(flight.estimated_departure || flight.scheduled_departure)
   );
 
   setText(
     "arrival_time",
-    formatTime(flight.estimated_arrival || flight.scheduled_arrival),
+    formatTime(flight.estimated_arrival || flight.scheduled_arrival)
   );
 
-  setText("departure_delay", formatDelay(flight.departure_delay_seconds));
+  setText(
+    "departure_delay",
+    formatDelay(flight.departure_delay_seconds)
+  );
 
-  setText("arrival_delay", formatDelay(flight.arrival_delay_seconds));
+  setText(
+    "arrival_delay",
+    formatDelay(flight.arrival_delay_seconds)
+  );
 
   setText("aircraft", flight.aircraft_type || "Not provided");
 
-  sessionStorage.setItem(
-    "aero_airports",
-    JSON.stringify({
-      origin: {
-        code: departure.airport,
-        name: departure.name,
-        city: departure.city,
-        latitude:
-          departure.latitude ?? departure.lat ?? departure.weather?.latitude,
-        longitude:
-          departure.longitude ?? departure.lon ?? departure.weather?.longitude,
-      },
-      destination: {
-        code: arrival.airport,
-        name: arrival.name,
-        city: arrival.city,
-        latitude: arrival.latitude ?? arrival.lat ?? arrival.weather?.latitude,
-        longitude:
-          arrival.longitude ?? arrival.lon ?? arrival.weather?.longitude,
-      },
-    }),
-  );
+  // Use the exact flight response for forecast navigation, not a previous route search.
+  window.aero_flight_context.store(context);
+  $("flight_forecast_link").href = window.aero_flight_context.forecast_url(context);
+  $("nav_forecast_link").href = window.aero_flight_context.forecast_url(context);
+  const identity = context.unique_id ? `Unique flight ID: ${context.unique_id}` :
+    `Search identifier: ${context.requested_id || context.number} · No unique flight instance ID returned by the API`;
+  setText("flight_identity", identity);
+  if (context.origin.is_metropolitan || context.destination.is_metropolitan) {
+    const metro = [context.origin,context.destination].filter(airport => airport.is_metropolitan).map(airport => airport.code).join(" and ");
+    setText("flight_airport_notice", `${metro} refers to a metropolitan area, not one airport. On the forecast page, select the actual airport before loading an airport-specific forecast. Your Lambda may need to return the precise IATA or ICAO airport code.`);
+    $("flight_airport_notice").classList.remove("hidden");
+  } else {
+    $("flight_airport_notice").classList.add("hidden");
+  }
   displayWeather("origin", departure);
   displayWeather("destination", arrival);
   displayForecast("origin", departure);
@@ -280,14 +290,17 @@ function renderFlight(data) {
     badge.classList.add("cancelled");
   } else if (status.includes("delay")) {
     badge.classList.add("delayed");
-  } else if (status.includes("air") || status.includes("route")) {
+  } else if (
+    status.includes("air") ||
+    status.includes("route")
+  ) {
     badge.classList.add("airborne");
   }
 
   $("results").classList.remove("hidden");
   $("results").scrollIntoView({
     behavior: "smooth",
-    block: "start",
+    block: "start"
   });
 }
 
@@ -301,7 +314,7 @@ function setLoading(active, message) {
   $("loading").classList.toggle("hidden", !active);
   setText("loading_text", message);
 
-  document.querySelectorAll(".action_button").forEach((button) => {
+  document.querySelectorAll(".action_button").forEach(button => {
     button.disabled = active;
   });
 }
@@ -314,12 +327,7 @@ async function fetchAPI(path, params) {
   });
 
   const response = await fetch(url.toString(), {
-    headers: {
-      Accept: "application/json",
-      ...(window.AEROTRACK_CONFIG.require_auth && window.aero_auth?.get_token()
-        ? { Authorization: `Bearer ${window.aero_auth.get_token()}` }
-        : {}),
-    },
+    headers: { Accept: "application/json", ...(window.AEROTRACK_CONFIG.require_auth && window.aero_auth?.get_token() ? { Authorization: `Bearer ${window.aero_auth.get_token()}` } : {}) }
   });
 
   let data;
@@ -335,7 +343,9 @@ async function fetchAPI(path, params) {
   }
 
   if (!response.ok || data.error) {
-    throw new Error(data.error || `Request failed (${response.status}).`);
+    throw new Error(
+      data.error || `Request failed (${response.status}).`
+    );
   }
 
   return data;
@@ -346,14 +356,15 @@ async function trackFlight(flightId, preserveRouteResults = false) {
 
   const id = flightId.trim().toUpperCase();
 
-  if (!/^[A-Z0-9]{2,25}$/.test(id)) {
+  if (!/^[A-Z0-9][A-Z0-9_:.-]{1,109}$/.test(id)) {
     return showError(
-      "Enter a flight number or identifier, such as AA100 or AAL100.",
+      "Enter a flight number or identifier, such as AA100 or AAL100."
     );
   }
 
   $("error_message").classList.add("hidden");
   $("results").classList.add("hidden");
+  $("nav_forecast_link").href = "forecast.html";
 
   if (!preserveRouteResults) {
     $("route_results").classList.add("hidden");
@@ -363,12 +374,14 @@ async function trackFlight(flightId, preserveRouteResults = false) {
 
   try {
     const data = await fetchAPI("/flight", {
-      flight_id: id,
+      flight_id: id
     });
 
-    renderFlight(data);
+    renderFlight(data, id);
   } catch (error) {
-    showError(error.message || "Unable to retrieve flight details.");
+    showError(
+      error.message || "Unable to retrieve flight details."
+    );
   } finally {
     setLoading(false, "");
   }
@@ -384,11 +397,13 @@ function makeElement(tag, className, text) {
 }
 
 function renderRouteResults(data) {
-  const flights = Array.isArray(data.flights) ? data.flights : [];
+  const flights = Array.isArray(data.flights)
+    ? data.flights
+    : [];
 
   setText(
     "route_results_title",
-    `${data.origin || "Origin"} to ${data.destination || "Destination"}`,
+    `${data.origin || "Origin"} to ${data.destination || "Destination"}`
   );
 
   setText("result_count", `${flights.length} flights`);
@@ -401,12 +416,12 @@ function renderRouteResults(data) {
       makeElement(
         "div",
         "empty_state",
-        "No flights were found for this route. Try different airport codes.",
-      ),
+        "No flights were found for this route. Try different airport codes."
+      )
     );
   }
 
-  flights.forEach((flight) => {
+  flights.forEach(flight => {
     const card = makeElement("article", "list_card");
     const content = makeElement("div", "list_content");
 
@@ -414,32 +429,32 @@ function renderRouteResults(data) {
       makeElement(
         "div",
         "list_flight",
-        flight.number || "Flight number unavailable",
-      ),
+        flight.number || "Flight number unavailable"
+      )
     );
 
     content.append(
       makeElement(
         "div",
         "list_route",
-        `${flight.origin?.airport || data.origin || "—"} ✈ ${flight.destination?.airport || data.destination || "—"}`,
-      ),
+        `${flight.origin?.airport || data.origin || "—"} ✈ ${flight.destination?.airport || data.destination || "—"}`
+      )
     );
 
     content.append(
       makeElement(
         "div",
         "list_meta",
-        `${flight.status || "Status unknown"} · Departs ${formatTime(flight.estimated_departure || flight.scheduled_departure)}`,
-      ),
+        `${flight.status || "Status unknown"} · Departs ${formatTime(flight.estimated_departure || flight.scheduled_departure)}`
+      )
     );
 
     content.append(
       makeElement(
         "div",
         "list_meta",
-        `Arrives ${formatTime(flight.estimated_arrival || flight.scheduled_arrival)}`,
-      ),
+        `Arrives ${formatTime(flight.estimated_arrival || flight.scheduled_arrival)}`
+      )
     );
 
     card.append(content);
@@ -447,34 +462,24 @@ function renderRouteResults(data) {
     const button = makeElement(
       "button",
       "list_action action_button",
-      "View details",
+      "View details"
     );
 
     button.type = "button";
 
-    if (!flight.number) {
+    const route_flight_id = flight.fa_flight_id || flight.faFlightID || flight.flight_id || flight.id || flight.number;
+    if (!route_flight_id) {
       button.disabled = true;
     } else {
       button.addEventListener("click", () => {
-        window.aero_selected_flight = String(flight.number).toUpperCase();
+        window.aero_selected_flight = String(flight.number || route_flight_id).toUpperCase();
         applyRouteFilter();
-        trackFlight(flight.number, true);
+        trackFlight(String(route_flight_id), true);
       });
     }
 
     card.dataset.flight_number = String(flight.number || "").toUpperCase();
-    card.dataset.filter_text = [
-      flight.number,
-      flight.airline,
-      flight.airline_name,
-      flight.operator,
-      flight.status,
-      flight.origin?.airport,
-      flight.destination?.airport,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
+    card.dataset.filter_text = [flight.number,flight.airline,flight.airline_name,flight.operator,flight.status,flight.origin?.airport,flight.destination?.airport].filter(Boolean).join(" ").toLowerCase();
     card.append(button);
     list.append(card);
   });
@@ -486,16 +491,16 @@ function renderRouteResults(data) {
 
   $("route_results").scrollIntoView({
     behavior: "smooth",
-    block: "start",
+    block: "start"
   });
 }
 
-flightForm.addEventListener("submit", (event) => {
+flightForm.addEventListener("submit", event => {
   event.preventDefault();
   trackFlight($("flight_input").value);
 });
 
-routeForm.addEventListener("submit", async (event) => {
+routeForm.addEventListener("submit", async event => {
   event.preventDefault();
 
   if (busy) return;
@@ -503,29 +508,39 @@ routeForm.addEventListener("submit", async (event) => {
   const origin = $("origin_input").value.trim().toUpperCase();
   const destination = $("destination_input").value.trim().toUpperCase();
 
-  if (!/^[A-Z]{3,4}$/.test(origin) || !/^[A-Z]{3,4}$/.test(destination)) {
-    return showError("Enter valid three or four letter airport codes.");
+  if (
+    !/^[A-Z]{3,4}$/.test(origin) ||
+    !/^[A-Z]{3,4}$/.test(destination)
+  ) {
+    return showError(
+      "Enter valid three or four letter airport codes."
+    );
   }
 
   if (origin === destination) {
-    return showError("Departure and arrival airports must be different.");
+    return showError(
+      "Departure and arrival airports must be different."
+    );
   }
 
   $("error_message").classList.add("hidden");
   $("results").classList.add("hidden");
   $("route_results").classList.add("hidden");
+  $("nav_forecast_link").href = "forecast.html";
 
   setLoading(true, "Finding flights on your route...");
 
   try {
     const data = await fetchAPI("/search", {
       origin,
-      destination,
+      destination
     });
 
     renderRouteResults(data);
   } catch (error) {
-    showError(error.message || "Unable to search this route.");
+    showError(
+      error.message || "Unable to search this route."
+    );
   } finally {
     setLoading(false, "");
   }
@@ -535,18 +550,14 @@ function applyRouteFilter() {
   const search = $("route_filter").value.trim().toLowerCase();
   const selected_only = $("hide_other_flights").checked;
   let shown = 0;
-  document.querySelectorAll("#flight_list .list_card").forEach((card) => {
+  document.querySelectorAll("#flight_list .list_card").forEach(card => {
     const matches_text = !search || card.dataset.filter_text.includes(search);
-    const matches_selected =
-      !selected_only ||
-      !window.aero_selected_flight ||
-      card.dataset.flight_number === window.aero_selected_flight;
+    const matches_selected = !selected_only || !window.aero_selected_flight || card.dataset.flight_number === window.aero_selected_flight;
     const visible = matches_text && matches_selected;
     card.classList.toggle("hidden", !visible);
     if (visible) shown++;
   });
-  $("route_filter_note").textContent =
-    `${shown} matching flights shown. Filtering uses data returned by your route search API.`;
+  $("route_filter_note").textContent = `${shown} matching flights shown. Filtering uses data returned by your route search API.`;
 }
-$("route_filter").addEventListener("input", applyRouteFilter);
-$("hide_other_flights").addEventListener("change", applyRouteFilter);
+$("route_filter").addEventListener("input",applyRouteFilter);
+$("hide_other_flights").addEventListener("change",applyRouteFilter);

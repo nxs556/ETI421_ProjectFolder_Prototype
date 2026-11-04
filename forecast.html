@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="config.js" defer></script>
     <script src="auth.js" defer></script>
+    <script src="flight_context.js" defer></script>
     <script src="forecast.js" defer></script>
   </head>
   <body>
@@ -19,7 +20,9 @@
       >
       <nav class="nav_links">
         <a href="index.html">Flights</a
-        ><a href="forecast.html" aria-current="page">Forecast</a>
+        ><a id="nav_forecast_link" href="forecast.html" aria-current="page"
+          >Forecast</a
+        >
       </nav>
       <div class="nav_right">
         <span id="auth_status" class="subtle">Checking access…</span
@@ -41,15 +44,66 @@
       </section>
       <div id="auth_notice" class="notice hidden"></div>
       <div id="app_content" class="hidden">
+        <section
+          id="flight_context_panel"
+          class="panel flight_context_panel hidden"
+          aria-label="Selected flight"
+        >
+          <div class="flight_context_header">
+            <div>
+              <span class="eyebrow">FORECAST FOR SELECTED FLIGHT</span>
+              <h2 id="forecast_flight_number">—</h2>
+            </div>
+            <span id="forecast_flight_status" class="flight_badge">—</span>
+          </div>
+          <p id="forecast_flight_id" class="helper"></p>
+          <p id="forecast_flight_date" class="helper"></p>
+          <p id="forecast_route" class="context_route"></p>
+          <p id="flight_override_notice" class="notice hidden"></p>
+          <a
+            id="back_to_flight"
+            href="index.html"
+            class="button_outline link_button"
+            >Back to flight search</a
+          >
+        </section>
+        <section
+          id="flight_time_panel"
+          class="panel flight_time_panel hidden"
+          aria-label="Flight time forecast"
+        >
+          <span class="eyebrow">FLIGHT TIME FORECAST</span>
+          <p class="helper">
+            Hourly prediction for the departure and arrival time returned by
+            your flight API. It can differ from daily highs and lows below.
+          </p>
+          <div id="flight_time_cards" class="flight_time_grid"></div>
+        </section>
         <section class="panel search_panel">
           <div class="route_fields forecast_fields">
             <div>
               <label for="origin_input">Departure airport or city</label
               ><input id="origin_input" placeholder="e.g. JFK or New York" />
+              <div
+                id="origin_airport_choice_box"
+                class="airport_choice_box hidden"
+              >
+                <label for="origin_airport_choice"
+                  >Select a specific airport</label
+                ><select id="origin_airport_choice"></select>
+              </div>
             </div>
             <div>
               <label for="destination_input">Arrival airport or city</label
               ><input id="destination_input" placeholder="e.g. LHR or London" />
+              <div
+                id="destination_airport_choice_box"
+                class="airport_choice_box hidden"
+              >
+                <label for="destination_airport_choice"
+                  >Select a specific airport</label
+                ><select id="destination_airport_choice"></select>
+              </div>
             </div>
             <button id="forecast_search" class="button_primary" type="button">
               Get forecast →
@@ -65,8 +119,9 @@
             </div>
           </div>
           <p class="helper">
-            When exact airport coordinates are unavailable, the forecast uses a
-            nearby city and is labeled as an approximation.
+            Specific airport codes use airport reference coordinates where
+            available. Metropolitan codes like NYC require you to choose an
+            airport. City forecasts are labeled as approximations.
           </p>
         </section>
         <div id="forecast_error" class="error hidden" role="alert"></div>
